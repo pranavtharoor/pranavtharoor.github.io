@@ -1,25 +1,58 @@
-<!DOCTYPE html>
 <html>
-<head>
-	<!-- <meta name="viewport" content="width=device-width, initial-scale=1.0" /> -->
-	<link rel="shortcut icon" href="static/icons/logo.png"/>
-	<title>Pranav Tharoor</title>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
-	<link href="https://fonts.googleapis.com/css?family=PT+Sans+Narrow" rel="stylesheet" />
-	<link href="https://fonts.googleapis.com/css?family=Patrick+Hand+SC" rel="stylesheet" />
-	<link rel="stylesheet" type="text/css" href="static/css/styles.css" />
-</head>
-<body>
-	<div class="message" id="top">&nbsp;&nbsp;&nbsp;&nbsp;THIS WEBSITE IS UNDER CONSTRUCTION&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;THIS WEBSITE IS UNDER CONSTRUCTION&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;THIS WEBSITE IS UNDER CONSTRUCTION</div>
-	<div class="message" id="bottom">THIS WEBSITE IS UNDER CONSTRUCTION&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;THIS WEBSITE IS UNDER CONSTRUCTION&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;THIS WEBSITE IS UNDER CONSTRUCTION&nbsp;&nbsp;&nbsp;</div>
-	<div id="centerContent">
-		<div class="myName">Pranav Tharoor</div>
-		<div class="links">
-			<a href="https://github.com/pranavtharoor" target="_blank"><i class="fa fa-github"></i></a>
-			<a href="https://in.linkedin.com/in/pranav-tharoor-682311134" target="_blank"><i class="fa fa-linkedin"></i></a>
-			<a href="https://www.facebook.com/pranav.tharoor" target="_blank"><i class="fa fa-facebook"></i></a>
-			<a href="https://twitter.com/PranavTharoor" target="_blank"><i class="fa fa-twitter"></i></a>
-		</div>
-	</div>
-</body>
+  <head>
+    <title>Pranav Tharoor</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/fontawesome.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/brands.min.css"
+    />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+  </head>
+  <body>
+    <div class="cursor cursor--small"></div>
+    <canvas class="cursor cursor--canvas" resize></canvas>
+
+    <div class="burger">
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+
+    <div class="flex landing">
+      <div class="intro-container">
+        <div class="intro">
+          <div>Hi! </div><div>I'm Pranav. </div>
+        </div>
+        <div class="sub-intro">
+          I'm a full-stack developer based in Bangalore with a passion for creating
+          scalable, beautiful applications.
+        </div>
+      </div>
+      <div class="photo">
+        <img src="/img/me-min.png" />
+      </div>
+    </div>
+    <div class="social">
+      <a target="_blank" href="https://github.com/pranavtharoor"
+        ><i class="link fab fa-github"></i><span>GitHub</span></a
+      >
+      <a target="_blank" href="https://www.facebook.com/pranav.tharoor"
+        ><i class="link fab fa-facebook-f"></i><span>Facebook</span></a
+      >
+      <a target="_blank" href="https://in.linkedin.com/in/pranavtharoor"
+        ><i class="link fab fa-linkedin-in"></i><span>LinkedIn</span></a
+      >
+    </div>
+  </body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.3/TweenMax.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.12.0/paper-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/simplex-noise/2.4.0/simplex-noise.min.js"></script>
+  <script src="/js/script.js"></script>
+  <script src="/js/mouse.js"></script>
 </html>
