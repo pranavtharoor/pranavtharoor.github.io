@@ -1,58 +1,1054 @@
-<html>
+<html lang="en">
   <head>
-    <title>Pranav Tharoor</title>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/fontawesome.min.css"
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pranav Tharoor — Software Engineer at Apple</title>
+    <meta
+      name="description"
+      content="Pranav Tharoor is a full-stack software engineer at Apple based in Bangalore, working on AI and Data Platforms. Experienced in Go, React, Kubernetes, Python, and more."
     />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
     <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Fira+Code:wght@400;500&amp;display=swap"
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/brands.min.css"
     />
-    <link rel="stylesheet" href="/css/styles.css" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg: #0a0a0f;
+        --bg2: #111118;
+        --bg3: #1a1a24;
+        --border: rgba(255, 255, 255, 0.08);
+        --text: #e8e8f0;
+        --muted: #8888aa;
+        --accent: #7c6af7;
+        --accent2: #5ee7df;
+        --apple: #555;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+        font-size: 16px;
+      }
+
+      /* NAV */
+      nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 5%;
+        height: 64px;
+        background: rgba(10, 10, 15, 0.85);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+      }
+      .nav-logo {
+        font-weight: 700;
+        font-size: 1.1rem;
+        background: linear-gradient(90deg, var(--accent), var(--accent2));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-decoration: none;
+      }
+      .nav-links {
+        display: flex;
+        gap: 2rem;
+        list-style: none;
+      }
+      .nav-links a {
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: color 0.2s;
+      }
+      .nav-links a:hover {
+        color: var(--text);
+      }
+
+      /* SECTIONS */
+      section {
+        padding: 120px 10% 80px;
+      }
+      section:first-of-type {
+        padding-top: 100px;
+      }
+
+      .section-label {
+        font-family: "Fira Code", monospace;
+        font-size: 0.8rem;
+        color: var(--accent);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-bottom: 0.75rem;
+      }
+      h2.section-title {
+        font-size: clamp(1.8rem, 4vw, 2.6rem);
+        font-weight: 700;
+        margin-bottom: 3rem;
+        color: var(--text);
+      }
+
+      /* HERO */
+      #hero {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        padding: 80px 10% 60px;
+        background: radial-gradient(
+          ellipse 80% 60% at 50% 0%,
+          rgba(124, 106, 247, 0.12) 0%,
+          transparent 70%
+        );
+      }
+      .hero-inner {
+        display: grid;
+        grid-template-columns: 1fr 340px;
+        gap: 4rem;
+        align-items: center;
+        width: 100%;
+      }
+      .hero-name {
+        font-size: clamp(2.2rem, 5vw, 3.2rem);
+        font-weight: 700;
+        line-height: 1.1;
+        margin-bottom: 1.5rem;
+        background: linear-gradient(135deg, var(--accent), var(--accent2));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .hero-card {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 16px;
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2),
+          inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      }
+      .hero-card-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        padding-bottom: 1.25rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      }
+      .hero-card-item:last-child {
+        padding-bottom: 0;
+        border-bottom: none;
+      }
+      .hero-card-label {
+        font-family: "Fira Code", monospace;
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--accent);
+        opacity: 0.8;
+      }
+      .hero-card-value {
+        font-size: 0.92rem;
+        font-weight: 500;
+        color: var(--text);
+      }
+      .hero-card-sub {
+        font-size: 0.78rem;
+        color: var(--muted);
+      }
+      .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(124, 106, 247, 0.1);
+        border: 1px solid rgba(124, 106, 247, 0.25);
+        border-radius: 999px;
+        padding: 0.35rem 0.9rem;
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: var(--accent);
+        margin-bottom: 1.5rem;
+      }
+      .hero-badge .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #22c55e;
+        animation: pulse 2s infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.4;
+        }
+      }
+
+      h1 {
+        font-size: clamp(2.4rem, 6vw, 4rem);
+        font-weight: 700;
+        line-height: 1.1;
+        margin-bottom: 1.5rem;
+      }
+      h1 .name {
+        color: var(--text);
+      }
+      h1 .role {
+        background: linear-gradient(135deg, var(--accent), var(--accent2));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .hero-sub {
+        font-size: 1.05rem;
+        color: var(--muted);
+        max-width: 540px;
+        margin-bottom: 2.5rem;
+        line-height: 1.8;
+      }
+      .hero-ctas {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.6rem;
+        border-radius: 999px;
+        font-size: 0.88rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        border: none;
+      }
+      .btn-primary {
+        background: linear-gradient(135deg, var(--accent), #9b7eff);
+        color: #fff;
+        box-shadow: 0 2px 16px rgba(124, 106, 247, 0.25);
+      }
+      .btn-primary:hover {
+        box-shadow: 0 4px 28px rgba(124, 106, 247, 0.45);
+        transform: translateY(-2px);
+      }
+      .btn-outline {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: var(--text);
+        backdrop-filter: blur(8px);
+      }
+      .btn-outline:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(124, 106, 247, 0.4);
+        color: var(--accent);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(124, 106, 247, 0.15);
+      }
+
+      .hero-photo-wrap {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .hero-photo-frame {
+        position: relative;
+        width: 320px;
+        height: 320px;
+        border-radius: 24px;
+        background: linear-gradient(135deg, var(--accent), var(--accent2));
+        padding: 3px;
+      }
+      .hero-photo-inner {
+        width: 100%;
+        height: 100%;
+        border-radius: 22px;
+        background: var(--bg3);
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .hero-photo-inner img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: grayscale(20%);
+      }
+      .hero-stats {
+        display: flex;
+        gap: 2rem;
+        margin-top: 2.5rem;
+      }
+      .stat {
+      }
+      .stat-num {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text);
+      }
+      .stat-label {
+        font-size: 0.75rem;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      /* ABOUT */
+      #about {
+        background: var(--bg2);
+      }
+      .about-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: start;
+      }
+      .about-text p {
+        color: var(--muted);
+        line-height: 1.8;
+        margin-bottom: 1rem;
+      }
+      .about-text p strong {
+        color: var(--text);
+      }
+      .about-highlights {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+      .highlight-card {
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.25rem 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+      .highlight-icon {
+        font-size: 1.5rem;
+      }
+      .highlight-card h4 {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text);
+      }
+      .highlight-card p {
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+
+      /* EXPERIENCE */
+      #experience {
+      }
+      .timeline {
+        position: relative;
+        padding-left: 2rem;
+      }
+      .timeline::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 8px;
+        bottom: 0;
+        width: 1px;
+        background: var(--border);
+      }
+      .job {
+        position: relative;
+        margin-bottom: 3rem;
+        padding-bottom: 3rem;
+        border-bottom: 1px solid var(--border);
+      }
+      .job:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+      }
+      .job::before {
+        content: "";
+        position: absolute;
+        left: -2rem;
+        top: 8px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--accent);
+        border: 2px solid var(--bg);
+        transform: translateX(-4px);
+      }
+      .job-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+      }
+      .job-title-wrap h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text);
+      }
+      .job-company {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: var(--accent);
+        margin-top: 0.2rem;
+      }
+      .job-date {
+        font-family: "Fira Code", monospace;
+        font-size: 0.78rem;
+        color: var(--muted);
+        background: var(--bg3);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 0.25rem 0.6rem;
+        white-space: nowrap;
+      }
+      .job p {
+        color: var(--muted);
+        font-size: 0.95rem;
+        line-height: 1.75;
+      }
+      .tag-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.75rem;
+      }
+      .tag {
+        font-family: "Fira Code", monospace;
+        font-size: 0.75rem;
+        color: var(--accent2);
+        background: rgba(94, 231, 223, 0.08);
+        border: 1px solid rgba(94, 231, 223, 0.18);
+        border-radius: 5px;
+        padding: 0.2rem 0.55rem;
+      }
+
+      /* SKILLS */
+      #skills {
+        background: var(--bg2);
+      }
+      .skills-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+      }
+      .skill-group {
+        background: rgba(255, 255, 255, 0.02);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 16px;
+        padding: 1.75rem;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12),
+          inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      }
+      .skill-group h4 {
+        font-family: "Fira Code", monospace;
+        font-size: 0.7rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--accent);
+        margin-bottom: 1.1rem;
+        opacity: 0.8;
+      }
+      .skill-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+      .pill {
+        font-size: 0.84rem;
+        font-weight: 500;
+        color: var(--text);
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 999px;
+        padding: 0.4rem 0.85rem;
+      }
+
+      /* PROJECTS */
+      #projects {
+      }
+      .projects-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+        gap: 1.5rem;
+      }
+      .project-card {
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 1.75rem;
+        transition: border-color 0.2s, transform 0.2s;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+      .project-card:hover {
+        border-color: var(--accent);
+        transform: translateY(-3px);
+      }
+      .project-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+      .project-icon {
+        font-size: 1.6rem;
+      }
+      .project-links {
+        display: flex;
+        gap: 0.5rem;
+      }
+      .project-links a {
+        color: var(--muted);
+        font-size: 0.8rem;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        transition: all 0.2s;
+      }
+      .project-links a:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      .project-card h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text);
+      }
+      .project-card p {
+        font-size: 0.88rem;
+        color: var(--muted);
+        line-height: 1.6;
+        flex: 1;
+      }
+
+      /* CONTACT */
+      #contact {
+        background: var(--bg2);
+        text-align: center;
+      }
+      .contact-inner {
+        max-width: 600px;
+        margin: 0 auto;
+        text-align: center;
+      }
+      .contact-inner p {
+        color: var(--muted);
+        margin-bottom: 2.5rem;
+        font-size: 1.05rem;
+        line-height: 1.75;
+      }
+      .contact-links {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+      .contact-link {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        text-decoration: none;
+        color: var(--text);
+        background: rgba(255, 255, 255, 0.04);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 999px;
+        padding: 0.8rem 1.4rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+      }
+      .contact-link:hover {
+        background: rgba(124, 106, 247, 0.1);
+        border-color: rgba(124, 106, 247, 0.35);
+        color: var(--accent);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(124, 106, 247, 0.15);
+      }
+      .contact-link svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      /* FOOTER */
+      footer {
+        text-align: center;
+        padding: 2rem;
+        color: var(--muted);
+        font-size: 0.82rem;
+        border-top: 1px solid var(--border);
+      }
+
+      /* RESPONSIVE */
+      @media (max-width: 900px) {
+        .hero-inner {
+          grid-template-columns: 1fr;
+        }
+        .hero-card {
+          display: none;
+        }
+        nav {
+          padding: 0 6%;
+        }
+        section {
+          padding: 100px 6% 60px;
+        }
+      }
+      @media (max-width: 600px) {
+        .nav-links {
+          display: none;
+        }
+      }
+    </style>
+    <style id="claude-agent-animation-styles">
+      @keyframes claude-pulse {
+        0% {
+          box-shadow: inset 0 0 10px rgba(217, 119, 87, 0.5),
+            inset 0 0 20px rgba(217, 119, 87, 0.3),
+            inset 0 0 30px rgba(217, 119, 87, 0.1);
+        }
+        50% {
+          box-shadow: inset 0 0 15px rgba(217, 119, 87, 0.7),
+            inset 0 0 25px rgba(217, 119, 87, 0.5),
+            inset 0 0 35px rgba(217, 119, 87, 0.2);
+        }
+        100% {
+          box-shadow: inset 0 0 10px rgba(217, 119, 87, 0.5),
+            inset 0 0 20px rgba(217, 119, 87, 0.3),
+            inset 0 0 30px rgba(217, 119, 87, 0.1);
+        }
+      }
+    </style>
   </head>
-  <body>
-    <div class="cursor cursor--small"></div>
-    <canvas class="cursor cursor--canvas" resize></canvas>
+  <body cz-shortcut-listen="true">
+    <!-- NAV -->
+    <nav>
+      <a class="nav-logo" href="#hero">PT</a>
+      <ul class="nav-links">
+        <li><a href="#experience">Experience</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
 
-    <div class="burger">
-      <div></div>
-      <div></div>
-      <div></div>
-    </div>
-
-    <div class="flex landing">
-      <div class="intro-container">
-        <div class="intro">
-          <div>Hi! </div><div>I'm Pranav. </div>
+    <!-- HERO -->
+    <section id="hero">
+      <div class="hero-inner">
+        <div class="hero-content">
+          <div class="hero-badge">
+            <span class="dot"></span>
+            Currently at Apple — Bangalore, India
+          </div>
+          <h1 class="hero-name">Pranav Tharoor</h1>
+          <p class="hero-sub">
+            Full-stack engineer on Apple's
+            <strong style="color: #e8e8f0"
+              >Artificial Intelligence &amp; Data Platforms</strong
+            >
+            team, working on generative AI solutions. Before Apple, I spent
+            two years at Cloudera building cloud microservices, and got my start
+            in open source through Google Summer of Code 2019 at McGill
+            University. When I'm not writing code, I'm usually at a concert,
+            playing sports, or exploring India with friends and family.
+          </p>
+          <div class="hero-ctas">
+            <a class="btn btn-primary" href="#contact">Get in touch</a>
+            <a class="btn btn-outline" href="#experience">View my work</a>
+          </div>
         </div>
-        <div class="sub-intro">
-          I'm a full-stack developer based in Bangalore with a passion for creating
-          scalable, beautiful applications.
+        <div class="hero-card">
+          <div class="hero-card-item">
+            <span class="hero-card-label">Currently</span>
+            <span class="hero-card-value">Software Engineer at Apple</span>
+            <span class="hero-card-sub">AI &amp; Data Platforms · Bangalore</span>
+          </div>
+          <div class="hero-card-item">
+            <span class="hero-card-label">Previously</span>
+            <span class="hero-card-value">Software Engineer at Cloudera</span>
+            <span class="hero-card-sub">Cloud Microservices · 2020–2022</span>
+          </div>
+          <div class="hero-card-item">
+            <span class="hero-card-label">Education</span>
+            <span class="hero-card-value">BTech, Information Technology</span>
+            <span class="hero-card-sub">Manipal Institute of Technology · 2016–2020</span>
+          </div>
+          <div class="hero-card-item">
+            <span class="hero-card-label">Open Source</span>
+            <span class="hero-card-value">Google Summer of Code 2019</span>
+            <span class="hero-card-sub">C3G / McGill University</span>
+          </div>
         </div>
       </div>
-      <div class="photo">
-        <img src="/img/me-min.png" />
+    </section>
+
+    <!-- EXPERIENCE -->
+    <section id="experience">
+      <p class="section-label">// experience</p>
+      <h2 class="section-title">Where I've Worked</h2>
+      <div class="timeline">
+        <div class="job">
+          <div class="job-header">
+            <div class="job-title-wrap">
+              <h3>Software Engineer</h3>
+              <div class="job-company">Apple</div>
+            </div>
+            <span class="job-date">Mar 2022 → Present</span>
+          </div>
+          <p>
+            Developing generative AI-based solutions as part of the Artificial
+            Intelligence and Data Platforms team. Working on scalable systems
+            that power intelligent features across Apple's products and
+            services.
+          </p>
+          <div class="tag-row">
+            <span class="tag">Python</span><span class="tag">Go</span
+            ><span class="tag">AI Agents</span
+            ><span class="tag">Kubernetes</span><span class="tag">React</span>
+          </div>
+        </div>
+
+        <div class="job">
+          <div class="job-header">
+            <div class="job-title-wrap">
+              <h3>Software Engineer II → Software Engineer I → Intern</h3>
+              <div class="job-company">Cloudera</div>
+            </div>
+            <span class="job-date">Jan 2020 → Mar 2022</span>
+          </div>
+          <p>
+            2+ years at Cloudera across three roles. Developed microservices
+            that form part of Cloudera Data Platform's Public &amp; Private
+            Cloud offerings. Grew from intern to full-time SE II over the course
+            of the tenure.
+          </p>
+          <div class="tag-row">
+            <span class="tag">Java</span><span class="tag">Go</span
+            ><span class="tag">Microservices</span
+            ><span class="tag">Cloud</span>
+          </div>
+        </div>
+
+        <div class="job">
+          <div class="job-header">
+            <div class="job-title-wrap">
+              <h3>Google Summer of Code Student</h3>
+              <div class="job-company">Canadian Centre for Computational Genomics</div>
+            </div>
+            <span class="job-date">May 2019 → Aug 2019</span>
+          </div>
+          <p>
+            Developed an end-to-end open source web application for McGill
+            University's research community. The app helps researchers in life
+            sciences connect with data science collaborators. Used by professors
+            and researchers at McGill.
+          </p>
+          <div class="tag-row">
+            <span class="tag">React.js</span><span class="tag">Node.js</span
+            ><span class="tag">Open Source</span>
+          </div>
+        </div>
+
+        <div class="job">
+          <div class="job-header">
+            <div class="job-title-wrap">
+              <h3>Web Developer Intern</h3>
+              <div class="job-company">Praktice.ai</div>
+            </div>
+            <span class="job-date">May 2018 → Jun 2018</span>
+          </div>
+          <p>
+            Developed the front end for an AI-powered chat assistant used in
+            healthcare. The product was deployed in hospitals including Apollo
+            Hospitals.
+          </p>
+          <div class="tag-row">
+            <span class="tag">React.js</span
+            ><span class="tag">Healthcare AI</span>
+          </div>
+        </div>
+
       </div>
-    </div>
-    <div class="social">
-      <a target="_blank" href="https://github.com/pranavtharoor"
-        ><i class="link fab fa-github"></i><span>GitHub</span></a
-      >
-      <a target="_blank" href="https://www.instagram.com/pranavtharoor"
-        ><i class="link fab fa-instagram"></i><span>Instagram</span></a
-      >
-      <a target="_blank" href="https://in.linkedin.com/in/pranavtharoor"
-        ><i class="link fab fa-linkedin-in"></i><span>LinkedIn</span></a
-      >
-    </div>
+    </section>
+
+    <!-- SKILLS -->
+    <section id="skills">
+      <p class="section-label">// tech stack</p>
+      <h2 class="section-title">Skills &amp; Technologies</h2>
+      <div class="skills-grid">
+        <div class="skill-group">
+          <h4>AI &amp; Data</h4>
+          <div class="skill-pills">
+            <span class="pill">AI Agents</span>
+            <span class="pill">Generative AI</span>
+            <span class="pill">Data Platforms</span>
+            <span class="pill">LLMs</span>
+          </div>
+        </div>
+        <div class="skill-group">
+          <h4>Languages</h4>
+          <div class="skill-pills">
+            <span class="pill">Go</span>
+            <span class="pill">Python</span>
+            <span class="pill">TypeScript</span>
+            <span class="pill">Java</span>
+          </div>
+        </div>
+        <div class="skill-group">
+          <h4>Frontend</h4>
+          <div class="skill-pills">
+            <span class="pill">React.js</span>
+            <span class="pill">Angular</span>
+            <span class="pill">HTML/CSS</span>
+          </div>
+        </div>
+        <div class="skill-group">
+          <h4>Infrastructure</h4>
+          <div class="skill-pills">
+            <span class="pill">Kubernetes</span>
+            <span class="pill">Docker</span>
+            <span class="pill">Microservices</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROJECTS (removed) -->
+    <!--
+    <section id="projects">
+      <p class="section-label">// projects</p>
+      <h2 class="section-title">Things I've Built</h2>
+      <div class="projects-grid">
+        <div class="project-card">
+          <div class="project-top">
+            <span class="project-icon">🧬</span>
+            <div class="project-links">
+              <a
+                href="https://github.com/c3g/micm-project-match"
+                target="_blank"
+                >↗ GitHub</a
+              >
+            </div>
+          </div>
+          <h3>MiCM Project Match</h3>
+          <p>
+            A database-driven web app for matching McGill University research
+            data projects with masters and doctoral students looking for
+            interesting projects to analyze. Built during GSoC '19.
+          </p>
+          <div class="tag-row">
+            <span class="tag">JavaScript</span><span class="tag">React</span
+            ><span class="tag">Node.js</span>
+          </div>
+        </div>
+
+        <div class="project-card">
+          <div class="project-top">
+            <span class="project-icon">🖥️</span>
+            <div class="project-links">
+              <a href="https://github.com/pranavtharoor/DAMN" target="_blank"
+                >↗ GitHub</a
+              >
+            </div>
+          </div>
+          <h3>DAMN — SSH Key Manager</h3>
+          <p>
+            A Go + Angular web application for securely requesting, granting,
+            and revoking access to servers by managing SSH keys of all node
+            servers through one central server.
+          </p>
+          <div class="tag-row">
+            <span class="tag">Go</span><span class="tag">TypeScript</span
+            ><span class="tag">Angular</span>
+          </div>
+        </div>
+
+        <div class="project-card">
+          <div class="project-top">
+            <span class="project-icon">🎮</span>
+            <div class="project-links">
+              <a
+                href="https://github.com/pranavtharoor/mc-manager"
+                target="_blank"
+                >↗ GitHub</a
+              >
+            </div>
+          </div>
+          <h3>MC Manager</h3>
+          <p>
+            A Discord bot written in Go to manage a Minecraft server. Handles
+            server administration commands through Discord for a seamless player
+            experience.
+          </p>
+          <div class="tag-row">
+            <span class="tag">Go</span><span class="tag">Discord API</span>
+          </div>
+        </div>
+
+        <div class="project-card">
+          <div class="project-top">
+            <span class="project-icon">💬</span>
+            <div class="project-links">
+              <a href="https://github.com/pranavtharoor/chatapp" target="_blank"
+                >↗ GitHub</a
+              >
+            </div>
+          </div>
+          <h3>Chat App</h3>
+          <p>
+            A real-time chat application built in JavaScript. An exploration of
+            WebSocket-based communication and real-time UI updates.
+          </p>
+          <div class="tag-row">
+            <span class="tag">JavaScript</span
+            ><span class="tag">WebSockets</span>
+          </div>
+        </div>
+
+        <div class="project-card">
+          <div class="project-top">
+            <span class="project-icon">🏥</span>
+            <div class="project-links"></div>
+          </div>
+          <h3>MRI Scheduler</h3>
+          <p>
+            A tool to reduce patient waiting times for MRI scans by optimizing
+            time windows based on normal sequence timing for each scan type.
+          </p>
+          <div class="tag-row">
+            <span class="tag">Healthcare</span><span class="tag">React</span>
+          </div>
+        </div>
+
+        <div class="project-card">
+          <div class="project-top">
+            <span class="project-icon">♟️</span>
+            <div class="project-links">
+              <a href="https://github.com/pranavtharoor/Chess" target="_blank"
+                >↗ GitHub</a
+              >
+            </div>
+          </div>
+          <h3>Chess (Java)</h3>
+          <p>
+            A client-side Java implementation of chess, forked and extended from
+            an open source chess engine. Explores game logic and OOP design
+            patterns.
+          </p>
+          <div class="tag-row"><span class="tag">Java</span></div>
+        </div>
+      </div>
+    </section>
+    -->
+
+    <!-- CONTACT -->
+    <section id="contact">
+      <h2 class="section-title">Get In Touch</h2>
+      <div class="contact-inner">
+        <p>
+          I'm always open to interesting conversations, collaborations, or just
+          a friendly chat about technology. Drop me a message through any of the
+          channels below.
+        </p>
+        <div class="contact-links">
+          <a class="contact-link" href="mailto:pranav.tharoor@gmail.com">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+            </svg>
+            Email
+          </a>
+          <a
+            class="contact-link"
+            href="https://in.linkedin.com/in/pranavtharoor"
+            target="_blank"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"
+              ></path>
+              <rect x="2" y="9" width="4" height="12"></rect>
+              <circle cx="4" cy="4" r="2"></circle>
+            </svg>
+            LinkedIn
+          </a>
+          <a
+            class="contact-link"
+            href="https://github.com/pranavtharoor"
+            target="_blank"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"
+              ></path>
+            </svg>
+            GitHub
+          </a>
+          <a
+            class="contact-link"
+            href="https://www.instagram.com/pranavtharoor"
+            target="_blank"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <rect x="2" y="2" width="20" height="20" rx="5"></rect>
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+            </svg>
+            Instagram
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <p>Designed &amp; built by Pranav Tharoor · 2026</p>
+    </footer>
   </body>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.3/TweenMax.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.12.0/paper-core.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/simplex-noise/2.4.0/simplex-noise.min.js"></script>
-  <script src="/js/script.js"></script>
-  <script src="/js/mouse.js"></script>
 </html>
