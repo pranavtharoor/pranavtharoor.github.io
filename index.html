@@ -122,11 +122,7 @@
         );
       }
       .hero-inner {
-        display: grid;
-        grid-template-columns: 1fr 340px;
-        gap: 4rem;
-        align-items: center;
-        width: 100%;
+        max-width: 640px;
       }
       .hero-name {
         font-size: clamp(2.2rem, 5vw, 3.2rem);
@@ -561,7 +557,7 @@
 
       /* CONTACT */
       #contact {
-        background: var(--bg2);
+        background: var(--bg3);
         text-align: center;
       }
       .contact-inner {
@@ -694,28 +690,7 @@
             <a class="btn btn-outline" href="#experience">View my work</a>
           </div>
         </div>
-        <div class="hero-card">
-          <div class="hero-card-item">
-            <span class="hero-card-label">Currently</span>
-            <span class="hero-card-value">Software Engineer at Apple</span>
-            <span class="hero-card-sub">AI &amp; Data Platforms · Bangalore</span>
-          </div>
-          <div class="hero-card-item">
-            <span class="hero-card-label">Previously</span>
-            <span class="hero-card-value">Software Engineer at Cloudera</span>
-            <span class="hero-card-sub">Cloud Microservices · 2020–2022</span>
-          </div>
-          <div class="hero-card-item">
-            <span class="hero-card-label">Education</span>
-            <span class="hero-card-value">BTech, Information Technology</span>
-            <span class="hero-card-sub">Manipal Institute of Technology · 2016–2020</span>
-          </div>
-          <div class="hero-card-item">
-            <span class="hero-card-label">Open Source</span>
-            <span class="hero-card-value">Google Summer of Code 2019</span>
-            <span class="hero-card-sub">C3G / McGill University</span>
-          </div>
-        </div>
+        <!-- hero-card hidden for now -->
       </div>
     </section>
 
@@ -1047,8 +1022,5 @@
       </div>
     </section>
 
-    <footer>
-      <p>Designed &amp; built by Pranav Tharoor · 2026</p>
-    </footer>
   </body>
 </html>
