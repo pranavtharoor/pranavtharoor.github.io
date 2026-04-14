@@ -110,21 +110,50 @@
         color: var(--text);
       }
 
-      /* HERO */
       #hero {
+        position: relative;
         min-height: 100vh;
         display: flex;
         align-items: center;
-        padding: 80px 10% 60px;
-        background: radial-gradient(
-          ellipse 80% 60% at 50% 0%,
-          rgba(124, 106, 247, 0.12) 0%,
-          transparent 70%
-        );
       }
+
+      /* RIGHT CONTENT */
       .hero-inner {
         max-width: 640px;
+        z-index: 1;
       }
+
+      /* LEFT VIDEO */
+      .hero-video {
+        position: absolute;
+        top: 0;
+        right: 0; /* anchor to left */
+        height: 100vh;
+        width: clamp(320px, 40vw, 600px);
+        overflow: hidden;
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .hero-video::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+
+        /* fade from background → transparent */
+        background: linear-gradient(to right, var(--bg) 0%, #0a0a0f7a 100%);
+        /* background: red; */
+
+        z-index: 1;
+        pointer-events: none;
+      }
+
+      /* VIDEO */
+      .hero-video video {
+        height: 140%;
+        transform: translate(0, -150px) rotateY(180deg);
+      }
+
       .hero-name {
         font-size: clamp(2.2rem, 5vw, 3.2rem);
         font-weight: 700;
@@ -674,18 +703,22 @@
             <strong style="color: #e8e8f0"
               >Artificial Intelligence &amp; Data Platforms</strong
             >
-            team, working on generative AI solutions. Before Apple, I spent
-            two years at Cloudera building cloud microservices, and got my start
-            in open source through Google Summer of Code 2019 at McGill
-            University. When I'm not writing code, I'm usually at a concert,
-            playing sports, or exploring the world with friends and family.
+            team, working on generative AI solutions. Before Apple, I spent two
+            years at Cloudera building cloud microservices, and got my start in
+            open source through Google Summer of Code 2019 at McGill University.
+            When I'm not writing code, I'm usually at a concert, playing sports,
+            or exploring the world with friends and family.
           </p>
           <div class="hero-ctas">
             <a class="btn btn-primary" href="#contact">Get in touch</a>
             <a class="btn btn-outline" href="#experience">View my work</a>
           </div>
         </div>
-        <!-- hero-card hidden for now -->
+      </div>
+      <div class="hero-video">
+        <video autoplay muted loop playsinline>
+          <source src="img/IMG_1265.MP4" type="video/mp4" />
+        </video>
       </div>
     </section>
 
@@ -740,7 +773,9 @@
           <div class="job-header">
             <div class="job-title-wrap">
               <h3>Google Summer of Code Student</h3>
-              <div class="job-company">Canadian Centre for Computational Genomics</div>
+              <div class="job-company">
+                Canadian Centre for Computational Genomics
+              </div>
             </div>
             <span class="job-date">May 2019 → Aug 2019</span>
           </div>
@@ -774,7 +809,6 @@
             ><span class="tag">Healthcare AI</span>
           </div>
         </div>
-
       </div>
     </section>
 
@@ -1016,6 +1050,5 @@
         </div>
       </div>
     </section>
-
   </body>
 </html>
