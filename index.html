@@ -143,41 +143,16 @@
         opacity: 0.6;
       }
 
-      /* Gradient overlays to blend video into background */
-      /* Left edge: solid bg fading to transparent */
+      /* Radial gradient overlay — reveals video at right-center, fades to bg in all directions */
       .hero-video::before {
         content: "";
         position: absolute;
-        top: 0;
-        left: 0;
-        width: 50%;
-        height: 100%;
-        background: linear-gradient(to right, var(--bg) 20%, transparent 100%);
-        z-index: 1;
-        pointer-events: none;
-      }
-
-      /* Top edge: fade into nav/bg */
-      .hero-video::after {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 15%;
-        background: linear-gradient(to bottom, var(--bg) 0%, transparent 100%);
-        z-index: 1;
-        pointer-events: none;
-      }
-
-      /* Bottom edge: fade into next section */
-      .hero-video-bottom-fade {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 25%;
-        background: linear-gradient(to top, var(--bg) 0%, transparent 100%);
+        inset: 0;
+        background: radial-gradient(
+          ellipse at 80% 50%,
+          transparent 15%,
+          var(--bg) 65%
+        );
         z-index: 1;
         pointer-events: none;
       }
@@ -717,7 +692,7 @@
         <li><a href="#experience">Experience</a></li>
         <li><a href="#skills">Skills</a></li>
         <li><a href="#contact">Contact</a></li>
-        <li><a href="/blog/">Blog</a></li>
+        <!-- <li><a href="/blog/">Blog</a></li> -->
       </ul>
     </nav>
 
@@ -751,7 +726,6 @@
         <video autoplay muted loop playsinline>
           <source src="img/IMG_1265.MP4" type="video/mp4" />
         </video>
-        <div class="hero-video-bottom-fade"></div>
       </div>
     </section>
 
