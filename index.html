@@ -723,7 +723,7 @@
         </div>
       </div>
       <div class="hero-video">
-        <video autoplay muted loop playsinline>
+        <video autoplay muted loop playsinline webkit-playsinline>
           <source src="img/IMG_1265.MP4" type="video/mp4" />
         </video>
       </div>
@@ -1057,5 +1057,15 @@
         </div>
       </div>
     </section>
+    <script>
+      // Safari autoplay fix — ensure muted attribute is set and trigger play
+      (function () {
+        var v = document.querySelector(".hero-video video");
+        if (v) {
+          v.muted = true;
+          v.play().catch(function () {});
+        }
+      })();
+    </script>
   </body>
 </html>
