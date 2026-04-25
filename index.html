@@ -115,43 +115,71 @@
         min-height: 100vh;
         display: flex;
         align-items: center;
+        overflow: hidden;
       }
 
-      /* RIGHT CONTENT */
       .hero-inner {
         max-width: 640px;
-        z-index: 1;
+        z-index: 2;
+        position: relative;
       }
 
-      /* LEFT VIDEO */
+      /* VIDEO BACKGROUND — right side */
       .hero-video {
         position: absolute;
         top: 0;
-        right: 0; /* anchor to left */
-        height: 100vh;
-        width: clamp(320px, 40vw, 600px);
+        right: 0;
+        width: 55%;
+        height: 100%;
         overflow: hidden;
-        display: flex;
-        justify-content: flex-end;
       }
 
+      .hero-video video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        transform: rotateY(180deg);
+        opacity: 0.6;
+      }
+
+      /* Gradient overlays to blend video into background */
+      /* Left edge: solid bg fading to transparent */
       .hero-video::before {
         content: "";
         position: absolute;
-        inset: 0;
-
-        /* fade from background → transparent */
-        background: linear-gradient(to right, var(--bg) 0%, #0a0a0f7a 100%);
-        /* background: red; */
-
+        top: 0;
+        left: 0;
+        width: 50%;
+        height: 100%;
+        background: linear-gradient(to right, var(--bg) 20%, transparent 100%);
         z-index: 1;
         pointer-events: none;
       }
 
-      /* VIDEO */
-      .hero-video video {
-        height: 140%;
-        transform: translate(0, -150px) rotateY(180deg);
+      /* Top edge: fade into nav/bg */
+      .hero-video::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 15%;
+        background: linear-gradient(to bottom, var(--bg) 0%, transparent 100%);
+        z-index: 1;
+        pointer-events: none;
+      }
+
+      /* Bottom edge: fade into next section */
+      .hero-video-bottom-fade {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 25%;
+        background: linear-gradient(to top, var(--bg) 0%, transparent 100%);
+        z-index: 1;
+        pointer-events: none;
       }
 
       .hero-name {
@@ -645,6 +673,9 @@
         .hero-card {
           display: none;
         }
+        .hero-video {
+          display: none;
+        }
         nav {
           padding: 0 6%;
         }
@@ -686,6 +717,7 @@
         <li><a href="#experience">Experience</a></li>
         <li><a href="#skills">Skills</a></li>
         <li><a href="#contact">Contact</a></li>
+        <li><a href="/blog/">Blog</a></li>
       </ul>
     </nav>
 
@@ -719,6 +751,7 @@
         <video autoplay muted loop playsinline>
           <source src="img/IMG_1265.MP4" type="video/mp4" />
         </video>
+        <div class="hero-video-bottom-fade"></div>
       </div>
     </section>
 

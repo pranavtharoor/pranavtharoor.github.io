@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The Strange Reality of Building AI Agents — Pranav Tharoor</title>
+    <meta
+      name="description"
+      content="Working on AI agents in production is nothing like the demos suggest. After two years building them at Apple, here's what I've actually learned."
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg: #0a0a0f;
+        --bg2: #111118;
+        --bg3: #1a1a24;
+        --border: rgba(255, 255, 255, 0.08);
+        --text: #e8e8f0;
+        --muted: #8888aa;
+        --accent: #7c6af7;
+        --accent2: #5ee7df;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+        font-size: 16px;
+        min-height: 100vh;
+      }
+
+      /* NAV */
+      nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 5%;
+        height: 64px;
+        background: rgba(10, 10, 15, 0.85);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+      }
+      .nav-logo {
+        font-weight: 700;
+        font-size: 1.1rem;
+        background: linear-gradient(90deg, var(--accent), var(--accent2));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-decoration: none;
+      }
+      .nav-links {
+        display: flex;
+        gap: 2rem;
+        list-style: none;
+      }
+      .nav-links a {
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: color 0.2s;
+      }
+      .nav-links a:hover,
+      .nav-links a.active {
+        color: var(--text);
+      }
+
+      /* ARTICLE */
+      .article-wrap {
+        max-width: 680px;
+        margin: 0 auto;
+        padding: 120px 5% 80px;
+      }
+
+      .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        text-decoration: none;
+        color: var(--muted);
+        font-size: 0.85rem;
+        font-weight: 500;
+        margin-bottom: 2.5rem;
+        transition: color 0.2s;
+      }
+      .back-link:hover {
+        color: var(--accent);
+      }
+
+      .article-meta {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+      }
+      .article-date {
+        font-family: "Fira Code", monospace;
+        font-size: 0.78rem;
+        color: var(--muted);
+      }
+      .article-tag {
+        font-family: "Fira Code", monospace;
+        font-size: 0.72rem;
+        color: var(--accent2);
+        background: rgba(94, 231, 223, 0.06);
+        border-radius: 999px;
+        padding: 0.2rem 0.6rem;
+      }
+
+      h1.article-title {
+        font-size: clamp(1.8rem, 4vw, 2.4rem);
+        font-weight: 700;
+        line-height: 1.2;
+        color: var(--text);
+        margin-bottom: 2.5rem;
+      }
+
+      /* PROSE */
+      .prose {
+        color: var(--muted);
+        font-size: 1.05rem;
+        line-height: 1.85;
+      }
+      .prose p {
+        margin-bottom: 1.6rem;
+      }
+      .prose p:last-child {
+        margin-bottom: 0;
+      }
+      .prose strong {
+        color: var(--text);
+        font-weight: 600;
+      }
+      .prose h2 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-top: 2.5rem;
+        margin-bottom: 1rem;
+        line-height: 1.3;
+      }
+      .prose h3 {
+        font-family: "Fira Code", monospace;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--accent);
+        margin-top: 2rem;
+        margin-bottom: 0.75rem;
+      }
+      .prose code {
+        font-family: "Fira Code", monospace;
+        font-size: 0.88em;
+        background: rgba(124, 106, 247, 0.08);
+        color: var(--accent2);
+        border-radius: 4px;
+        padding: 0.15em 0.4em;
+      }
+      .prose blockquote {
+        border-left: 2px solid var(--accent);
+        margin: 1.75rem 0;
+        padding: 0.5rem 0 0.5rem 1.5rem;
+        color: var(--text);
+        font-size: 1.05rem;
+        font-style: italic;
+        opacity: 0.85;
+      }
+      .prose hr {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 2.5rem 0;
+      }
+
+      /* FOOTER */
+      footer {
+        text-align: center;
+        padding: 2rem;
+        color: var(--muted);
+        font-size: 0.82rem;
+        border-top: 1px solid var(--border);
+        margin-top: 4rem;
+      }
+
+      @media (max-width: 600px) {
+        .nav-links {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <a class="nav-logo" href="/">PT</a>
+      <ul class="nav-links">
+        <li><a href="/#experience">Experience</a></li>
+        <li><a href="/#skills">Skills</a></li>
+        <li><a href="/#contact">Contact</a></li>
+        <li><a href="/blog/" class="active">Blog</a></li>
+      </ul>
+    </nav>
+
+    <article class="article-wrap">
+      <a class="back-link" href="/blog/">← All posts</a>
+
+      <div class="article-meta">
+        <span class="article-date">2026-04-14</span>
+        <span class="article-tag">AI</span>
+      </div>
+
+      <h1 class="article-title">The Strange Reality of Building AI Agents</h1>
+
+      <div class="prose">
+        <p>
+          Every few months, a new demo makes the rounds. An AI agent browses the web,
+          books flights, files taxes, writes and deploys code — all in a single
+          three-minute video. The comments light up. "AGI is here." "Engineers are
+          finished." "Why would anyone hire a developer in five years?"
+        </p>
+
+        <p>
+          I've been building AI agents in production for over two years now. The
+          reality is simultaneously more exciting and more humbling than any demo
+          suggests.
+        </p>
+
+        <hr />
+
+        <h2>What a demo gets right</h2>
+
+        <p>
+          The demos aren't lying. The raw capability is genuinely astonishing. Large
+          language models can reason across long contexts, generate syntactically
+          correct code in a dozen languages, infer intent from ambiguous instructions,
+          and chain together multi-step plans with a coherence that would have seemed
+          like science fiction five years ago.
+        </p>
+
+        <p>
+          When you wire a capable model to the right tools — a code interpreter,
+          a search API, the ability to write files and call services — the
+          emergent behavior is striking. Watching an agent decompose a vague
+          instruction into concrete sub-tasks, execute them in sequence, and
+          self-correct when something breaks is genuinely new territory for
+          software.
+        </p>
+
+        <blockquote>
+          The gap isn't in what AI agents can do. It's in how reliably they do it
+          when the world doesn't cooperate.
+        </blockquote>
+
+        <h2>What a demo leaves out</h2>
+
+        <h3>// reliability</h3>
+        <p>
+          Production software isn't a controlled demo. Users don't always provide
+          clear inputs. External APIs return unexpected responses. Systems have
+          partial failures. In a traditional software stack, you write code that
+          handles these cases explicitly — validation, retries, fallbacks. An agent
+          must reason its way through them.
+        </p>
+        <p>
+          Sometimes it does so brilliantly, recovering from an edge case you never
+          anticipated. Other times it confidently makes exactly the wrong call. The
+          non-determinism that makes LLMs feel "intelligent" is the same property
+          that makes them hard to trust at the tail end of a distribution. And in
+          production, the tail is where things break.
+        </p>
+
+        <h3>// evaluation</h3>
+        <p>
+          Traditional software is easy to test — you define inputs and expected
+          outputs, you write assertions, you run the suite. Agents don't have
+          right answers; they have better and worse answers along dimensions that
+          are hard to quantify: correctness, efficiency, tone, the degree to which
+          they stayed within the intended scope.
+        </p>
+        <p>
+          Evaluation becomes one of the hardest parts of the job. You end up
+          building parallel infrastructure just to answer the question: <em>is this
+          version better than the last one?</em> Human raters, LLM-as-judge pipelines,
+          golden datasets curated by hand — it's real engineering, unglamorous
+          and essential.
+        </p>
+
+        <h3>// prompt brittleness</h3>
+        <p>
+          Everyone who has worked with LLMs at depth has a story about a prompt
+          that worked perfectly in development and fell apart in production. An
+          extra sentence in the system prompt. A slightly different phrasing of
+          the user request. A change in model version that altered the
+          token distribution in ways you couldn't predict.
+        </p>
+        <p>
+          Prompt engineering gets dismissed as "not real engineering." That's
+          wrong. Figuring out how to consistently elicit a specific behavior from
+          a probabilistic system — across diverse inputs, across model updates,
+          across the long tail of user intent — is a genuinely hard problem.
+          It just doesn't look like the engineering we're used to.
+        </p>
+
+        <h2>What this actually changes</h2>
+
+        <p>
+          None of this is an argument that AI agents aren't transformative. They
+          are. The question is what the transformation looks like from inside the
+          engineering work.
+        </p>
+        <p>
+          The most useful mental model I've found: an AI agent is not a replacement
+          for deterministic software. It's a new primitive that handles the parts
+          of a system that were previously too ambiguous or too varied to automate
+          at all. The skill is in knowing where to trust it and where to keep a
+          human — or a traditional algorithm — in the loop.
+        </p>
+        <p>
+          That judgment doesn't come from watching demos. It comes from shipping
+          things, watching them fail in interesting ways, and building up an
+          intuition for the shape of the problem space. Which, if you think about
+          it, is exactly how we learned to build reliable software in the first
+          place.
+        </p>
+
+        <hr />
+
+        <p>
+          The most honest thing I can say about working in this space is that I
+          find it genuinely exciting — not because AI is magic, but because it
+          isn't. The hard problems are still hard. The craft is still real. The
+          bar for what "working" means is just higher, and more interesting, than
+          it used to be.
+        </p>
+      </div>
+    </article>
+
+    <footer>
+      <p>© 2026 Pranav Tharoor</p>
+    </footer>
+  </body>
+</html>
