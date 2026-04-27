@@ -199,12 +199,16 @@
       }
 
       .hero-video video {
+        position: absolute;
+        top: 0;
+        left: 0;
         width: 100%;
-        height: 100%;
+        height: 120%;
         object-fit: cover;
         object-position: center;
-        transform: rotateY(180deg);
+        transform: rotateY(180deg) translate3d(0, var(--parallax, 0px), 0);
         opacity: 0.55;
+        will-change: transform;
       }
 
       /* Layered gradient overlays — soft vignette fade on all edges */
@@ -1074,6 +1078,46 @@
         }
       })();
 
+      // Hero video parallax — moves slower than scroll for a cinematic anchored feel
+      (function () {
+        var video = document.querySelector(".hero-video video");
+        var container = document.querySelector(".hero-video");
+        if (!video || !container) return;
+
+        var prefersReduced = window.matchMedia(
+          "(prefers-reduced-motion: reduce)"
+        );
+        if (prefersReduced.matches) return;
+
+        var ticking = false;
+        var factor = 0.2;
+
+        function update() {
+          // Skip work on small viewports where the video is hidden
+          if (window.innerWidth <= 900) {
+            video.style.setProperty("--parallax", "0px");
+            ticking = false;
+            return;
+          }
+          var maxOffset = container.offsetHeight * 0.18;
+          var offset = Math.min(window.scrollY * factor, maxOffset);
+          video.style.setProperty("--parallax", offset + "px");
+          ticking = false;
+        }
+
+        window.addEventListener(
+          "scroll",
+          function () {
+            if (!ticking) {
+              requestAnimationFrame(update);
+              ticking = true;
+            }
+          },
+          { passive: true }
+        );
+        window.addEventListener("resize", update, { passive: true });
+        update();
+      })();
     </script>
   </body>
 </html>
