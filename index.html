@@ -129,7 +129,7 @@
         position: absolute;
         top: 0;
         right: 0;
-        width: 55%;
+        width: 60%;
         height: 100%;
         overflow: hidden;
       }
@@ -140,19 +140,18 @@
         object-fit: cover;
         object-position: center;
         transform: rotateY(180deg);
-        opacity: 0.6;
+        opacity: 0.55;
       }
 
-      /* Radial gradient overlay — reveals video at right-center, fades to bg in all directions */
+      /* Layered gradient overlays — soft vignette fade on all edges */
       .hero-video::before {
         content: "";
         position: absolute;
         inset: 0;
-        background: radial-gradient(
-          ellipse at 80% 50%,
-          transparent 15%,
-          var(--bg) 65%
-        );
+        background:
+          linear-gradient(to right, var(--bg) 0%, rgba(10,10,15,0.6) 30%, transparent 60%),
+          linear-gradient(to bottom, var(--bg) 0%, transparent 25%),
+          linear-gradient(to top, var(--bg) 0%, transparent 30%);
         z-index: 1;
         pointer-events: none;
       }
