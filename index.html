@@ -90,9 +90,73 @@
       /* SECTIONS */
       section {
         padding: 120px 10% 80px;
+        position: relative;
       }
       section:first-of-type {
         padding-top: 100px;
+      }
+
+      /* AURORA DIVIDERS — flowing energy between sections */
+      .aurora-divider {
+        position: relative;
+        height: 1px;
+        width: 100%;
+        overflow: visible;
+        z-index: 5;
+      }
+      .aurora-divider::before {
+        content: "";
+        position: absolute;
+        top: -1px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(124, 106, 247, 0) 10%,
+          rgba(124, 106, 247, 0.8) 30%,
+          rgba(94, 231, 223, 0.9) 50%,
+          rgba(124, 106, 247, 0.8) 70%,
+          rgba(124, 106, 247, 0) 90%,
+          transparent 100%
+        );
+        background-size: 200% 100%;
+        animation: aurora-flow 8s ease-in-out infinite;
+        filter: blur(0.5px);
+      }
+      .aurora-divider::after {
+        content: "";
+        position: absolute;
+        top: -8px;
+        left: 0;
+        right: 0;
+        height: 16px;
+        background: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(124, 106, 247, 0) 15%,
+          rgba(124, 106, 247, 0.25) 35%,
+          rgba(94, 231, 223, 0.3) 50%,
+          rgba(124, 106, 247, 0.25) 65%,
+          rgba(124, 106, 247, 0) 85%,
+          transparent 100%
+        );
+        background-size: 200% 100%;
+        animation: aurora-flow 8s ease-in-out infinite;
+        filter: blur(8px);
+        opacity: 0.8;
+      }
+      @keyframes aurora-flow {
+        0%,
+        100% {
+          background-position: 0% 50%;
+          opacity: 0.7;
+        }
+        50% {
+          background-position: 100% 50%;
+          opacity: 1;
+        }
       }
 
       .section-label {
@@ -269,31 +333,26 @@
         font-size: 0.88rem;
         font-weight: 600;
         text-decoration: none;
-        transition: all 0.3s ease;
+        transition: all 0.15s ease;
         cursor: pointer;
         border: none;
       }
       .btn-primary {
         background: linear-gradient(135deg, var(--accent), #9b7eff);
         color: #fff;
-        box-shadow: 0 2px 16px rgba(124, 106, 247, 0.25);
+        box-shadow: 0 2px 16px rgba(124, 106, 247, 0.2);
       }
       .btn-primary:hover {
-        box-shadow: 0 4px 28px rgba(124, 106, 247, 0.45);
-        transform: translateY(-2px);
+        filter: brightness(1.1);
       }
       .btn-outline {
         background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.12);
         color: var(--text);
         backdrop-filter: blur(8px);
       }
       .btn-outline:hover {
-        background: rgba(255, 255, 255, 0.08);
-        border-color: rgba(124, 106, 247, 0.4);
+        background: rgba(255, 255, 255, 0.07);
         color: var(--accent);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 20px rgba(124, 106, 247, 0.15);
       }
 
       .hero-photo-wrap {
@@ -389,44 +448,20 @@
         color: var(--muted);
       }
 
-      /* EXPERIENCE */
+      /* EXPERIENCE — editorial / typographic */
       #experience {
       }
       .timeline {
-        position: relative;
-        padding-left: 2rem;
-      }
-      .timeline::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 8px;
-        bottom: 0;
-        width: 1px;
-        background: var(--border);
+        display: flex;
+        flex-direction: column;
       }
       .job {
-        position: relative;
-        margin-bottom: 3rem;
-        padding-bottom: 3rem;
-        border-bottom: 1px solid var(--border);
+        padding: 2rem 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
       }
-      .job:last-child {
-        border-bottom: none;
-        margin-bottom: 0;
-        padding-bottom: 0;
-      }
-      .job::before {
-        content: "";
-        position: absolute;
-        left: -2rem;
-        top: 8px;
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        background: var(--accent);
-        border: 2px solid var(--bg);
-        transform: translateX(-4px);
+      .job:first-child {
+        border-top: none;
+        padding-top: 0;
       }
       .job-header {
         display: flex;
@@ -616,10 +651,8 @@
         transition: all 0.3s ease;
       }
       .contact-link:hover {
-        background: rgba(124, 106, 247, 0.1);
+        background: rgba(124, 106, 247, 0.08);
         color: var(--accent);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 20px rgba(124, 106, 247, 0.15);
       }
       .contact-link svg {
         width: 18px;
@@ -722,7 +755,6 @@
 
     <!-- EXPERIENCE -->
     <section id="experience">
-      <p class="section-label">// experience</p>
       <h2 class="section-title">Where I've Worked</h2>
       <div class="timeline">
         <div class="job">
@@ -739,32 +771,21 @@
             that power intelligent features across Apple's products and
             services.
           </p>
-          <div class="tag-row">
-            <span class="tag">Python</span><span class="tag">Go</span
-            ><span class="tag">AI Agents</span
-            ><span class="tag">Kubernetes</span><span class="tag">React</span>
-          </div>
         </div>
 
         <div class="job">
           <div class="job-header">
             <div class="job-title-wrap">
-              <h3>Software Engineer II → Software Engineer I → Intern</h3>
+              <h3>Software Engineer II</h3>
               <div class="job-company">Cloudera</div>
             </div>
             <span class="job-date">Jan 2020 → Mar 2022</span>
           </div>
           <p>
-            2+ years at Cloudera across three roles. Developed microservices
-            that form part of Cloudera Data Platform's Public &amp; Private
-            Cloud offerings. Grew from intern to full-time SE II over the course
-            of the tenure.
+            Developed microservices powering Cloudera Data Platform's Public
+            &amp; Private Cloud offerings. Joined as an intern and grew into a
+            full-time engineering role over 2+ years.
           </p>
-          <div class="tag-row">
-            <span class="tag">Java</span><span class="tag">Go</span
-            ><span class="tag">Microservices</span
-            ><span class="tag">Cloud</span>
-          </div>
         </div>
 
         <div class="job">
@@ -783,10 +804,6 @@
             sciences connect with data science collaborators. Used by professors
             and researchers at McGill.
           </p>
-          <div class="tag-row">
-            <span class="tag">React.js</span><span class="tag">Node.js</span
-            ><span class="tag">Open Source</span>
-          </div>
         </div>
 
         <div class="job">
@@ -802,17 +819,14 @@
             healthcare. The product was deployed in hospitals including Apollo
             Hospitals.
           </p>
-          <div class="tag-row">
-            <span class="tag">React.js</span
-            ><span class="tag">Healthcare AI</span>
-          </div>
         </div>
       </div>
     </section>
 
+    <div class="aurora-divider"></div>
+
     <!-- SKILLS -->
     <section id="skills">
-      <p class="section-label">// tech stack</p>
       <h2 class="section-title">Skills &amp; Technologies</h2>
       <div class="skills-grid">
         <div class="skill-group">
@@ -851,6 +865,8 @@
         </div>
       </div>
     </section>
+
+    <div class="aurora-divider"></div>
 
     <!-- PROJECTS (removed) -->
     <!--
@@ -1057,6 +1073,7 @@
           v.play().catch(function () {});
         }
       })();
+
     </script>
   </body>
 </html>
