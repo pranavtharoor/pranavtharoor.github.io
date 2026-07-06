@@ -20,16 +20,20 @@ python3 -m http.server 8080
 
 This is a single-page static site. All files are served as-is by GitHub Pages.
 
-- **`index.html`** — The entire site. Contains all markup and inline `<style>` with its own design tokens (Inter/Fira Code fonts, dark theme with `--accent: #7c6af7`).
-- **`css/styles.css`** — A separate, older stylesheet (Poppins/Montserrat fonts, `--primary-accent: #27b2e9`). Currently diverged from `index.html`'s inline styles — the two design systems are not in sync.
-- **`js/script.js`** — Nav hide-on-scroll, mobile burger menu, smooth anchor scrolling, IntersectionObserver-based section reveal animations, custom dot cursor.
-- **`js/mouse.js`** — Three.js WebGL blob rendered to `.cursor--canvas`. Uses a custom GLSL shader with Simplex noise for organic deformation driven by `time` and `mouse` uniforms. Three.js is loaded from CDN.
-- **`img/me-min.png`** — Profile photo.
-- **`Resume.pdf`** — Linked resume.
+- **`index.html`** — The entire site, fully self-contained: all markup, one inline `<style>`, and inline `<script>` blocks at the end of `<body>`. It does not load `css/styles.css`, `js/script.js`, or `js/mouse.js` — those are legacy files from previous designs, kept in the repo but unused.
+- **`img/IMG_1265.MP4`** — Portrait lake video used as the full-bleed hero background.
+- **`img/me-min.png`** — Profile photo (currently unused by `index.html`).
+- **`blog/`** — Separate static blog pages, not linked from the main page.
+- **`Resume.pdf`** — Resume (currently not linked from the page).
 - **`CNAME`** — GitHub Pages custom domain config.
 
 ## Key Design Notes
 
-- The custom cursor (`cursor: none` on body) is replaced by a small dot (`.cursor--small`) that tracks the mouse, and a full-viewport Three.js canvas behind the page content.
-- Section reveal: sections start at `opacity: 0; transform: translateY(50px)` and transition to visible when the IntersectionObserver fires the `.is-visible` class.
-- CSS variables in `index.html` inline styles (`--accent`, `--bg`, etc.) differ from those in `css/styles.css` (`--primary-accent`, `--bg-color`, etc.) — changes to one don't affect the other.
+The design direction is "cinematic editorial": dark, typographic, restrained. The user actively avoids anything that reads as AI-generated — no cards, pills, borders/border-radius, purple gradients, hover lifts, or drop shadows. Prefer hairline dividers, type hierarchy, and subtle color shifts.
+
+- **Design tokens** (in `:root`): `--ink` (near-black background), `--bone` (warm off-white text), `--muted`, `--gold` (champagne accent, used sparingly), `--line` (hairline rgba borders), `--ease` (expo-out curve for reveals).
+- **Type system**: Fraunces (display serif — masthead, section titles, job roles), Hanken Grotesk (body), IBM Plex Mono (small uppercase labels via `.mono`). Loaded from Google Fonts.
+- **Hero**: full-bleed autoplaying video, mirrored with `rotateY(180deg)`, graded with a CSS `filter` plus a vignette overlay (`.hero-video::after`). Scroll parallax moves the video at 0.18× scroll speed via the `--parallax` custom property (rAF-throttled). Autoplay is defensive: retries on `loadedmetadata`/`canplay`, first touch/click/scroll, and `visibilitychange`; iOS's native play overlay is hidden via `::-webkit-media-controls`. The video stays visible on mobile.
+- **Motion**: hero lines rise in with masked reveals on load; everything else uses `[data-reveal]` + IntersectionObserver adding `.is-in` (optional stagger via inline `--d` delay). A slow CSS marquee strip sits below the hero (content duplicated twice for a seamless loop — edit both `.marquee-set` blocks identically). Film grain is a fixed, animated SVG-noise overlay (`.grain`). All motion is disabled under `prefers-reduced-motion`.
+- **Icons/glyphs**: use inline SVG, not Unicode glyphs — Fraunces lacks symbols like `↗`, and mobile font fallback renders them as emoji (this bit us once with the footer arrow).
+- **Footer**: giant "Let's talk" serif mailto with underline-draw link hovers, plus a live Bangalore clock (`.js-clock`, updated via `Intl.DateTimeFormat` with `Asia/Kolkata`).
