@@ -155,6 +155,12 @@
         filter: grayscale(0.15) contrast(1.05) brightness(0.72);
         will-change: transform;
       }
+      /* Hide the native play overlay iOS shows when autoplay is deferred */
+      .hero-video video::-webkit-media-controls,
+      .hero-video video::-webkit-media-controls-start-playback-button {
+        display: none !important;
+        -webkit-appearance: none;
+      }
       .hero-video::after {
         content: "";
         position: absolute;
@@ -445,9 +451,16 @@
       .contact-giant .arrow {
         display: inline-block;
         font-size: 0.42em;
+        width: 1em;
+        height: 1em;
         vertical-align: 0.72em;
         margin-left: 0.12em;
         transition: transform 0.35s var(--ease);
+      }
+      .contact-giant .arrow svg {
+        display: block;
+        width: 100%;
+        height: 100%;
       }
       .contact-giant:hover em {
         color: var(--gold);
@@ -613,7 +626,7 @@
     <!-- HERO -->
     <header id="hero">
       <div class="hero-video">
-        <video autoplay muted loop playsinline webkit-playsinline>
+        <video autoplay muted loop playsinline webkit-playsinline preload="auto">
           <source src="img/IMG_1265.MP4" type="video/mp4" />
         </video>
       </div>
@@ -814,7 +827,7 @@
         data-reveal
         style="--d: 0.1s"
       >
-        Let's <em>talk</em><span class="arrow">↗</span>
+        Let's <em>talk</em><span class="arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M6 18 18 6M8.5 6H18v9.5" /></svg></span>
       </a>
       <p class="contact-note" data-reveal style="--d: 0.2s">
         I'm always open to interesting conversations, collaborations, or just a
@@ -833,13 +846,40 @@
     </footer>
 
     <script>
-      // Safari autoplay fix — ensure muted attribute is set and trigger play
+      // Autoplay — mobile Safari/Chrome defer or block play() in several
+      // situations (Low Power Mode, Data Saver, metadata not ready), so
+      // retry on media-ready events and on the first user interaction.
       (function () {
         var v = document.querySelector(".hero-video video");
-        if (v) {
-          v.muted = true;
-          v.play().catch(function () {});
+        if (!v) return;
+        v.muted = true;
+        v.playsInline = true;
+
+        function tryPlay() {
+          if (!v.paused) return;
+          var p = v.play();
+          if (p) p.catch(function () {});
         }
+
+        tryPlay();
+        v.addEventListener("loadedmetadata", tryPlay);
+        v.addEventListener("canplay", tryPlay);
+
+        function onInteract() {
+          tryPlay();
+          if (!v.paused) {
+            window.removeEventListener("touchstart", onInteract);
+            window.removeEventListener("click", onInteract);
+            window.removeEventListener("scroll", onInteract);
+          }
+        }
+        window.addEventListener("touchstart", onInteract, { passive: true });
+        window.addEventListener("click", onInteract);
+        window.addEventListener("scroll", onInteract, { passive: true });
+
+        document.addEventListener("visibilitychange", function () {
+          if (!document.hidden) tryPlay();
+        });
       })();
 
       // Hero video parallax — moves slower than scroll for a cinematic anchored feel
