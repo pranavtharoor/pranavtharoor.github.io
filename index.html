@@ -694,7 +694,9 @@
     <!-- HERO -->
     <header id="hero">
       <div class="hero-video">
-        <video autoplay muted loop playsinline webkit-playsinline preload="auto">
+        <!-- poster carries the hero when autoplay is refused outright, as iOS
+             Low Power Mode does regardless of how often we retry play() -->
+        <video autoplay muted loop playsinline webkit-playsinline preload="auto" poster="img/hero-poster.jpg">
           <source src="img/IMG_1265.MP4" type="video/mp4" />
         </video>
       </div>
@@ -1064,6 +1066,10 @@
             media.playsInline = true;
             media.setAttribute("playsinline", "");
             media.preload = "none";
+            // Every clip has a matching -poster.jpg. Without it a clip that is
+            // never allowed to play — iOS Low Power Mode refuses even muted
+            // autoplay — renders as an empty box instead of a picture.
+            media.poster = entry.src.replace(/\.mp4$/, "-poster.jpg");
           } else {
             media = document.createElement("img");
             media.loading = "lazy";
@@ -1104,14 +1110,22 @@
 
         var clips = section.querySelectorAll("video.otc-media");
         if (!clips.length || !("IntersectionObserver" in window)) return;
+        // Under reduced motion the posters simply stay put — no playback.
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+        var onScreen = [];
         var io = new IntersectionObserver(
           function (entries) {
             entries.forEach(function (entry) {
+              var v = entry.target;
+              var i = onScreen.indexOf(v);
               if (entry.isIntersecting) {
-                var p = entry.target.play();
+                if (i < 0) onScreen.push(v);
+                var p = v.play();
                 if (p) p.catch(function () {});
               } else {
-                entry.target.pause();
+                if (i > -1) onScreen.splice(i, 1);
+                v.pause();
               }
             });
           },
@@ -1119,6 +1133,23 @@
         );
         clips.forEach(function (v) {
           io.observe(v);
+        });
+
+        // Mobile Safari defers or refuses play() in Low Power Mode and on
+        // Data Saver. Retry whatever is on screen at the first real gesture;
+        // if it never comes, the posters are already showing.
+        function retry() {
+          onScreen.forEach(function (v) {
+            if (v.paused) {
+              var p = v.play();
+              if (p) p.catch(function () {});
+            }
+          });
+        }
+        window.addEventListener("touchstart", retry, { passive: true });
+        window.addEventListener("click", retry);
+        document.addEventListener("visibilitychange", function () {
+          if (!document.hidden) retry();
         });
       })();
 
