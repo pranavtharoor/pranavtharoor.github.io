@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Not found — Pranav Tharoor</title>
+    <meta name="robots" content="noindex" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..500;1,9..144,300..500&amp;family=Hanken+Grotesk:wght@300;400&amp;family=IBM+Plex+Mono:wght@400&amp;display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --ink: #0d0d0f;
+        --bone: #eae7e1;
+        --muted: #8f8c85;
+        --gold: #c2a87c;
+        --line: rgba(234, 231, 225, 0.12);
+        --serif: "Fraunces", Georgia, serif;
+        --sans: "Hanken Grotesk", -apple-system, sans-serif;
+        --mono: "IBM Plex Mono", monospace;
+        --ease: cubic-bezier(0.19, 1, 0.22, 1);
+      }
+
+      body {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 5vh 5vw;
+        font-family: var(--sans);
+        font-weight: 300;
+        background: var(--ink);
+        color: var(--bone);
+        line-height: 1.6;
+        font-size: 16px;
+        overflow-x: hidden;
+      }
+
+      ::selection {
+        background: var(--gold);
+        color: var(--ink);
+      }
+
+      .mono {
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        font-weight: 400;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      /* Same fixed, animated noise overlay as the main page */
+      .grain {
+        position: fixed;
+        inset: -120px;
+        z-index: 300;
+        pointer-events: none;
+        opacity: 0.05;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='280'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        animation: grain 1.4s steps(7) infinite;
+      }
+      @keyframes grain {
+        0% { transform: translate(0, 0); }
+        20% { transform: translate(-40px, 30px); }
+        40% { transform: translate(30px, -50px); }
+        60% { transform: translate(-50px, -20px); }
+        80% { transform: translate(40px, 40px); }
+        100% { transform: translate(0, 0); }
+      }
+
+      .top {
+        display: flex;
+        justify-content: space-between;
+        gap: 2rem;
+        color: var(--muted);
+      }
+      .top a {
+        color: var(--muted);
+        text-decoration: none;
+        transition: color 0.2s ease;
+      }
+      .top a:hover {
+        color: var(--bone);
+      }
+
+      main {
+        padding: 6vh 0;
+      }
+
+      .code {
+        color: var(--gold);
+        margin-bottom: 1.6rem;
+      }
+
+      h1 {
+        font-family: var(--serif);
+        font-weight: 360;
+        font-size: clamp(3rem, 11vw, 9rem);
+        line-height: 0.98;
+        letter-spacing: -0.01em;
+      }
+      h1 .line {
+        display: block;
+        overflow: hidden;
+        padding-bottom: 0.06em;
+      }
+      h1 .line-inner {
+        display: block;
+        transform: translateY(112%);
+        animation: rise 1.2s var(--ease) 0.15s forwards;
+      }
+      h1 em {
+        font-style: italic;
+        font-weight: 340;
+      }
+
+      .note {
+        max-width: 42ch;
+        margin-top: 2.4rem;
+        color: var(--muted);
+        opacity: 0;
+        animation: fade-in 1s ease 0.7s forwards;
+      }
+
+      .back {
+        display: inline-block;
+        margin-top: 2rem;
+        color: var(--bone);
+        text-decoration: none;
+        padding-bottom: 2px;
+        background-image: linear-gradient(currentColor, currentColor);
+        background-size: 0% 1px;
+        background-position: left bottom;
+        background-repeat: no-repeat;
+        transition: background-size 0.35s var(--ease), color 0.2s ease;
+        opacity: 0;
+        animation: fade-in 1s ease 0.85s forwards;
+      }
+      .back:hover {
+        color: var(--gold);
+        background-size: 100% 1px;
+      }
+
+      footer {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        padding-top: 1.6rem;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+      }
+      footer .js-clock {
+        color: var(--bone);
+      }
+
+      @keyframes rise {
+        to { transform: translateY(0); }
+      }
+      @keyframes fade-in {
+        to { opacity: 1; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .grain,
+        h1 .line-inner,
+        .note,
+        .back {
+          animation: none;
+        }
+        h1 .line-inner {
+          transform: none;
+        }
+        .note,
+        .back {
+          opacity: 1;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .top,
+        footer {
+          flex-direction: column;
+          gap: 0.4rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="grain" aria-hidden="true"></div>
+
+    <div class="top mono">
+      <a href="/">Pranav Tharoor</a>
+      <span>Bangalore, India</span>
+    </div>
+
+    <main>
+      <p class="code mono">( 404 )</p>
+      <h1>
+        <span class="line"
+          ><span class="line-inner">Nothing <em>here</em></span></span
+        >
+      </h1>
+      <p class="note">
+        This page either moved or never existed. The old blog and résumé were
+        retired — everything worth reading now lives on the front page.
+      </p>
+      <a class="back mono" href="/">← Back to the beginning</a>
+    </main>
+
+    <footer class="mono">
+      <span>© 2026 Pranav Tharoor</span>
+      <span>Bangalore, India — <span class="js-clock">--:--</span> IST</span>
+    </footer>
+
+    <script>
+      // Same live Bangalore clock as the front page
+      (function () {
+        var fmt = new Intl.DateTimeFormat("en-GB", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+          timeZone: "Asia/Kolkata",
+        });
+        var els = document.querySelectorAll(".js-clock");
+        function tick() {
+          var t = fmt.format(new Date());
+          els.forEach(function (el) {
+            el.textContent = t;
+          });
+        }
+        tick();
+        setInterval(tick, 30000);
+      })();
+    </script>
+  </body>
+</html>

@@ -6,7 +6,7 @@
     <title>Pranav Tharoor</title>
     <meta
       name="description"
-      content="Pranav Tharoor is a full-stack software engineer at Apple based in Bangalore, working on AI and Data Platforms. Experienced in Go, React, Kubernetes, Python, and more."
+      content="Building generative AI systems on Apple's Artificial Intelligence &amp; Data Platforms team. Based in Bangalore."
     />
     <link rel="canonical" href="https://pranavtharoor.com/" />
 
@@ -36,6 +36,37 @@
       content="Building generative AI systems on Apple's Artificial Intelligence &amp; Data Platforms team. Based in Bangalore."
     />
     <meta name="twitter:image" content="https://pranavtharoor.com/img/og.jpg?v=1" />
+
+    <!-- Structured data, so search engines tie the name to the right person.
+         Deliberately no email here — it is already a mailto link in the page,
+         and repeating it as structured data only makes harvesting tidier. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Pranav Tharoor",
+        "url": "https://pranavtharoor.com/",
+        "image": "https://pranavtharoor.com/img/og.jpg",
+        "jobTitle": "Software Engineer",
+        "worksFor": { "@type": "Organization", "name": "Apple" },
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Bangalore",
+          "addressRegion": "Karnataka",
+          "addressCountry": "IN"
+        },
+        "knowsAbout": [
+          "Generative AI",
+          "Large Language Models",
+          "Data Platforms",
+          "Distributed Systems"
+        ],
+        "sameAs": [
+          "https://github.com/pranavtharoor",
+          "https://in.linkedin.com/in/pranavtharoor"
+        ]
+      }
+    </script>
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -184,11 +215,22 @@
         filter: grayscale(0.15) contrast(1.05) brightness(0.72);
         will-change: transform;
       }
-      /* Hide the native play overlay iOS shows when autoplay is deferred */
-      .hero-video video::-webkit-media-controls,
-      .hero-video video::-webkit-media-controls-start-playback-button {
+      /* iOS paints its own play button over any paused video — including over
+         a poster while autoplay is still being refused. Cover every shadow
+         part, and apply it to the strip clips too, not just the hero. */
+      video::-webkit-media-controls,
+      video::-webkit-media-controls-enclosure,
+      video::-webkit-media-controls-panel,
+      video::-webkit-media-controls-panel-container,
+      video::-webkit-media-controls-overlay-play-button,
+      video::-webkit-media-controls-play-button,
+      video::-webkit-media-controls-start-playback-button {
         display: none !important;
-        -webkit-appearance: none;
+        -webkit-appearance: none !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        height: 0 !important;
+        width: 0 !important;
       }
       .hero-video::after {
         content: "";
@@ -702,6 +744,196 @@
         .foot-bar {
           flex-direction: column;
           gap: 0.4rem;
+        }
+      }
+
+      /* ————— PRINT —————
+         Cmd+P should produce a clean one-page CV, which is why there is no
+         longer a Resume.pdf to keep in sync. Ink-on-paper, film and photos
+         dropped, link targets spelled out because paper has no hyperlinks. */
+      @media print {
+        @page {
+          margin: 16mm 15mm;
+        }
+        body {
+          background: #fff !important;
+          color: #111 !important;
+          font-size: 10pt;
+          line-height: 1.5;
+        }
+        .grain,
+        nav,
+        .marquee,
+        #offtheclock,
+        .hero-video,
+        .hero-credit,
+        .scroll-cue,
+        .foot-bar,
+        .contact-giant .arrow,
+        /* the numbering is a screen device, and hiding Off the Clock would
+           leave it reading 01, 02, 04 on paper */
+        .sec-idx,
+        .contact-kicker {
+          display: none !important;
+        }
+        [data-reveal] {
+          opacity: 1 !important;
+          transform: none !important;
+          transition: none !important;
+        }
+        section,
+        #experience,
+        #skills {
+          padding: 0 0 7mm !important;
+        }
+        /* Masthead becomes a CV letterhead */
+        #hero {
+          height: auto !important;
+          min-height: 0 !important;
+          overflow: visible !important;
+          page-break-after: avoid;
+        }
+        .hero-frame {
+          display: block !important;
+          height: auto !important;
+          padding: 0 0 5mm !important;
+        }
+        .hero-top,
+        .hero-bottom {
+          opacity: 1 !important;
+          animation: none !important;
+          color: #111 !important;
+        }
+        .hero-top {
+          display: flex !important;
+          justify-content: space-between !important;
+          gap: 10mm;
+        }
+        .hero-bottom {
+          display: block !important;
+        }
+        /* on screen this is --bone for contrast against the film; on white it
+           would all but vanish */
+        .hero-top .mono span {
+          color: #111 !important;
+        }
+        .hero-name {
+          font-size: 26pt !important;
+          line-height: 1.05 !important;
+          color: #111 !important;
+          margin-bottom: 2mm;
+        }
+        .hero-name .line {
+          display: inline !important;
+          overflow: visible !important;
+        }
+        .hero-name .line-inner {
+          display: inline !important;
+          transform: none !important;
+          animation: none !important;
+        }
+        .hero-name .line--2 {
+          margin-left: 0.25em !important;
+        }
+        .hero-role {
+          max-width: none !important;
+          font-size: 10pt !important;
+          color: #111 !important;
+        }
+        .hero-role em,
+        .statement-lead em,
+        .sec-idx,
+        .cap h4,
+        .contact-giant em,
+        .job-idx {
+          color: #111 !important;
+        }
+        .statement-lead {
+          font-size: 13pt !important;
+          line-height: 1.35 !important;
+        }
+        .statement-body p,
+        .job-desc,
+        .job-date,
+        .job-co,
+        .contact-note {
+          color: #333 !important;
+        }
+        #about {
+          display: block !important;
+        }
+        .statement-body {
+          max-width: none !important;
+          margin-top: 3mm;
+        }
+        .sec-head {
+          margin-bottom: 4mm !important;
+          page-break-after: avoid;
+        }
+        .sec-title {
+          font-size: 15pt !important;
+        }
+        .jobs {
+          border-top: 1px solid #ccc !important;
+        }
+        .job {
+          grid-template-columns: 1fr auto !important;
+          gap: 1mm 5mm !important;
+          padding: 3mm 0 !important;
+          border-bottom: 1px solid #ccc !important;
+          page-break-inside: avoid;
+        }
+        .job-idx {
+          display: none !important;
+        }
+        .job-role {
+          font-size: 11.5pt !important;
+        }
+        .job-desc {
+          grid-column: 1 / -1 !important;
+          max-width: none !important;
+          font-size: 9.5pt !important;
+        }
+        .caps {
+          grid-template-columns: repeat(4, 1fr) !important;
+          border-top: 1px solid #ccc !important;
+          padding-top: 4mm !important;
+          gap: 5mm !important;
+          page-break-inside: avoid;
+        }
+        .cap li {
+          font-size: 9.5pt !important;
+          line-height: 1.7 !important;
+          color: #111 !important;
+        }
+        #contact {
+          padding: 5mm 0 0 !important;
+          page-break-inside: avoid;
+        }
+        .contact-giant {
+          font-size: 18pt !important;
+          color: #111 !important;
+        }
+        .contact-note {
+          margin-top: 3mm !important;
+          font-size: 9.5pt !important;
+        }
+        .contact-links {
+          border-top: 1px solid #ccc !important;
+          margin-top: 5mm !important;
+          padding-top: 3mm !important;
+          gap: 2mm 6mm !important;
+        }
+        .contact-links a {
+          color: #111 !important;
+          background-image: none !important;
+        }
+        /* Paper has no hyperlinks — print where each one actually goes */
+        .contact-links a::after {
+          content: " — " attr(href);
+          font-family: var(--mono);
+          font-size: 8pt;
+          color: #666;
         }
       }
     </style>

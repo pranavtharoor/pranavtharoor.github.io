@@ -23,6 +23,8 @@ This is a single-page static site. All files are served as-is by GitHub Pages.
 - **`index.html`** — The entire site, fully self-contained: all markup, one inline `<style>`, and inline `<script>` blocks at the end of `<body>`. There are no external CSS or JS files.
 - **`img/IMG_1265.MP4`** — Portrait lake video used as the full-bleed hero background.
 - **`img/me-min.png`** — Profile photo. Not used by `index.html`; kept as a candidate `og:image` source.
+- **`img/og.jpg`** — 1200×630 social card: a mirrored, graded frame of the hero footage with the masthead set in real Fraunces. `og:image` is absolute and carries a `?v=` — bump it whenever the file is replaced or Facebook and LinkedIn will keep serving the cached copy. Fraunces is not installed locally, so regenerating this means downloading the TTFs from Google Fonts first; otherwise ffmpeg silently falls back to Georgia.
+- **`404.html`** — Served automatically by GitHub Pages. Standalone copy of the design tokens, grain, and clock; it shares nothing with `index.html`, so a token change needs applying in both.
 
 The legacy `css/`, `js/`, `blog/`, and `Resume.pdf` files from earlier designs were deleted — don't recreate them. Recover from git history if ever needed.
 - **`CNAME`** — GitHub Pages custom domain config.
@@ -42,4 +44,5 @@ The design direction is "cinematic editorial": dark, typographic, restrained. Th
   - **Every clip needs a matching `otc-<slug>-poster.jpg`** (the script derives the path from the `src`). A clip that is never allowed to play renders as an empty box without one — iOS Low Power Mode refuses even muted autoplay, and no amount of retrying `play()` changes that. Playback is retried on first touch/click and on `visibilitychange`, and is skipped entirely under `prefers-reduced-motion`, where the posters stand in.
   - Media files live in `img/` as `otc-<slug>.jpg|mp4` — slugs, not indices, so reordering never means renaming. Encode stills at ~1000px wide and clips at 960px tall, and **always pass `-map_metadata -1`** so embedded GPS from the original photo is not published.
   - Section indices are sequential — adding a section means renumbering the ones after it.
+- **Print** (`@media print` at the end of the `<style>`): `Cmd+P` is the CV — that is why there is no `Resume.pdf`. Ink on white, film/nav/marquee/strip dropped, link targets printed via `a::after { content: attr(href) }`. Two traps when editing: anything coloured `--bone` vanishes on white (`.hero-top .mono span` had to be forced dark), and the section indices are hidden because dropping Off the Clock would leave them reading 01, 02, 04. To preview it, `sed 's/@media print {/@media screen {/' index.html > _tmp.html`, look at that, then delete it.
 - **Footer**: giant "Let's talk" serif mailto with underline-draw link hovers, plus a live Bangalore clock (`.js-clock`, updated via `Intl.DateTimeFormat` with `Asia/Kolkata`).

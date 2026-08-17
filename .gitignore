@@ -1,0 +1,5 @@
+# Local Claude Code state — launch.json is intentionally tracked, the rest is not
+.claude/skills/
+.claude/worktrees/
+
+.DS_Store
