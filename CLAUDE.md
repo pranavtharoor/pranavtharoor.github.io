@@ -20,11 +20,11 @@ python3 -m http.server 8080
 
 This is a single-page static site. All files are served as-is by GitHub Pages.
 
-- **`index.html`** — The entire site, fully self-contained: all markup, one inline `<style>`, and inline `<script>` blocks at the end of `<body>`. It does not load `css/styles.css`, `js/script.js`, or `js/mouse.js` — those are legacy files from previous designs, kept in the repo but unused.
+- **`index.html`** — The entire site, fully self-contained: all markup, one inline `<style>`, and inline `<script>` blocks at the end of `<body>`. There are no external CSS or JS files.
 - **`img/IMG_1265.MP4`** — Portrait lake video used as the full-bleed hero background.
-- **`img/me-min.png`** — Profile photo (currently unused by `index.html`).
-- **`blog/`** — Separate static blog pages, not linked from the main page.
-- **`Resume.pdf`** — Resume (currently not linked from the page).
+- **`img/me-min.png`** — Profile photo. Not used by `index.html`; kept as a candidate `og:image` source.
+
+The legacy `css/`, `js/`, `blog/`, and `Resume.pdf` files from earlier designs were deleted — don't recreate them. Recover from git history if ever needed.
 - **`CNAME`** — GitHub Pages custom domain config.
 
 ## Key Design Notes
@@ -33,7 +33,12 @@ The design direction is "cinematic editorial": dark, typographic, restrained. Th
 
 - **Design tokens** (in `:root`): `--ink` (near-black background), `--bone` (warm off-white text), `--muted`, `--gold` (champagne accent, used sparingly), `--line` (hairline rgba borders), `--ease` (expo-out curve for reveals).
 - **Type system**: Fraunces (display serif — masthead, section titles, job roles), Hanken Grotesk (body), IBM Plex Mono (small uppercase labels via `.mono`). Loaded from Google Fonts.
-- **Hero**: full-bleed autoplaying video, mirrored with `rotateY(180deg)`, graded with a CSS `filter` plus a vignette overlay (`.hero-video::after`). Scroll parallax moves the video at 0.18× scroll speed via the `--parallax` custom property (rAF-throttled). Autoplay is defensive: retries on `loadedmetadata`/`canplay`, first touch/click/scroll, and `visibilitychange`; iOS's native play overlay is hidden via `::-webkit-media-controls`. The video stays visible on mobile.
+- **Hero**: full-bleed autoplaying video, mirrored with `rotateY(180deg)`, graded with a CSS `filter` plus a vignette overlay (`.hero-video::after`). Scroll parallax moves the video at 0.18× scroll speed via the `--parallax` custom property (rAF-throttled). Autoplay is defensive: retries on `loadedmetadata`/`canplay`, first touch/click/scroll, and `visibilitychange`; iOS's native play overlay is hidden via `::-webkit-media-controls`. The video stays visible on mobile. `.hero-credit` names the footage (Ana Sagar Lake, Ajmer — Dec 2025) the way a film credits a location; it sits above `( Scroll )` in `.hero-aside`, and since the scroll cue is hidden under 640px the aside re-aligns left so the credit still reads.
 - **Motion**: hero lines rise in with masked reveals on load; everything else uses `[data-reveal]` + IntersectionObserver adding `.is-in` (optional stagger via inline `--d` delay). A slow CSS marquee strip sits below the hero (content duplicated twice for a seamless loop — edit both `.marquee-set` blocks identically). Film grain is a fixed, animated SVG-noise overlay (`.grain`). All motion is disabled under `prefers-reduced-motion`.
 - **Icons/glyphs**: use inline SVG, not Unicode glyphs — Fraunces lacks symbols like `↗`, and mobile font fallback renders them as emoji (this bit us once with the footer arrow).
+- **Off the Clock** (`#offtheclock`): horizontal strip of self-hosted stills/clips that bleeds off the right edge (`margin-right: -5vw`), native scroll with `scroll-snap`, scrollbar hidden. Items are 3:4, desaturated at rest and full colour on hover. **Never use Instagram embeds here** — they inject a light-mode card and external script that break the whole design direction.
+  - The strip's contents come from the **`OFF_THE_CLOCK` array** in the inline script; the markup is an empty `.otc-strip` div. Reorder by moving a line, add by copying one. `clip: true` builds a `<video>` (muted, looped, `preload="none"`, played only while on screen) instead of an `<img>`.
+  - An item whose media 404s deletes itself, and the section deletes itself if none remain, so missing assets can't ship a broken strip. Stills are `loading="lazy"` and clips are `preload="none"`, so that cleanup only runs once the section is scrolled near, not at page load.
+  - Media files live in `img/` as `otc-<slug>.jpg|mp4` — slugs, not indices, so reordering never means renaming. Encode stills at ~1000px wide and clips at 960px tall, and **always pass `-map_metadata -1`** so embedded GPS from the original photo is not published.
+  - Section indices are sequential — adding a section means renumbering the ones after it.
 - **Footer**: giant "Let's talk" serif mailto with underline-draw link hovers, plus a live Bangalore clock (`.js-clock`, updated via `Intl.DateTimeFormat` with `Asia/Kolkata`).

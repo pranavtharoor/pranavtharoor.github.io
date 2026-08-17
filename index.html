@@ -237,6 +237,18 @@
       .hero-role em {
         color: var(--gold);
       }
+      .hero-aside {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 0.6rem;
+      }
+      /* Credits the hero footage the way a film would — quiet, and the one
+         line that says the video is his rather than stock. */
+      .hero-credit {
+        color: rgba(234, 231, 225, 0.5);
+        white-space: nowrap;
+      }
       .scroll-cue {
         color: var(--muted);
         text-decoration: none;
@@ -421,6 +433,55 @@
         line-height: 2.1;
       }
 
+      /* ————— OFF THE CLOCK ————— */
+      #offtheclock {
+        padding-top: clamp(4rem, 9vh, 7rem);
+      }
+      .otc-strip {
+        display: flex;
+        gap: clamp(1.25rem, 2.5vw, 2.25rem);
+        border-top: 1px solid var(--line);
+        padding-top: 3rem;
+        /* bleed off the right edge — the strip should feel like it continues */
+        margin-right: -5vw;
+        padding-right: 5vw;
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+        scroll-snap-type: x proximity;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+      .otc-strip::-webkit-scrollbar {
+        display: none;
+      }
+      .otc-item {
+        flex: 0 0 auto;
+        width: clamp(215px, 25vw, 330px);
+        scroll-snap-align: start;
+      }
+      .otc-media {
+        display: block;
+        width: 100%;
+        aspect-ratio: 3 / 4;
+        object-fit: cover;
+        filter: grayscale(0.32) brightness(0.86);
+        transition: filter 0.55s var(--ease);
+      }
+      .otc-item:hover .otc-media {
+        filter: grayscale(0) brightness(1);
+      }
+      .otc-cap {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-top: 0.95rem;
+        color: var(--muted);
+      }
+      .otc-where {
+        color: var(--bone);
+      }
+
       /* ————— CONTACT / FOOTER ————— */
       #contact {
         padding: clamp(7rem, 18vh, 12rem) 5vw 2.2rem;
@@ -548,6 +609,9 @@
           transform: none;
           transition: none;
         }
+        .otc-media {
+          transition: none;
+        }
       }
 
       /* ————— RESPONSIVE ————— */
@@ -587,6 +651,9 @@
           gap: 0.6rem;
           align-items: flex-start;
         }
+        .hero-aside {
+          align-items: flex-start;
+        }
         .scroll-cue {
           display: none;
         }
@@ -619,6 +686,7 @@
       <ul class="nav-links">
         <li><a href="#experience">Experience</a></li>
         <li><a href="#skills">Capabilities</a></li>
+        <li><a href="#offtheclock">Off the Clock</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
     </nav>
@@ -644,7 +712,10 @@
             Building generative AI systems on Apple's
             <em>Artificial Intelligence &amp; Data Platforms</em> team.
           </p>
-          <a class="scroll-cue mono" href="#about">( Scroll )</a>
+          <div class="hero-aside">
+            <span class="hero-credit mono">Ana Sagar Lake, Ajmer — Dec 2025</span>
+            <a class="scroll-cue mono" href="#about">( Scroll )</a>
+          </div>
         </div>
       </div>
     </header>
@@ -816,10 +887,20 @@
       </div>
     </section>
 
+    <!-- OFF THE CLOCK -->
+    <section id="offtheclock">
+      <div class="sec-head" data-reveal>
+        <h2 class="sec-title">Off the Clock</h2>
+        <span class="sec-idx mono">( 03 )</span>
+      </div>
+      <!-- Items are built from the OFF_THE_CLOCK list in the script below. -->
+      <div class="otc-strip" data-reveal></div>
+    </section>
+
     <!-- CONTACT -->
     <footer id="contact">
       <p class="contact-kicker mono" data-reveal>
-        <span class="sec-idx">( 03 )</span> — Get in touch
+        <span class="sec-idx">( 04 )</span> — Get in touch
       </p>
       <a
         class="contact-giant"
@@ -937,6 +1018,107 @@
         );
         els.forEach(function (el) {
           io.observe(el);
+        });
+      })();
+
+      // ————— OFF THE CLOCK —————
+      // The strip renders this list in order. To reorder, move a line. To add
+      // one, copy a line and change the fields; to remove one, delete it.
+      // `clip: true` means an .mp4 — muted, looping, played only while on
+      // screen. Media is cropped to 3:4, so frame for a portrait crop.
+      var OFF_THE_CLOCK = [
+        { src: "img/otc-skandagiri.mp4", place: "Skandagiri",  year: "2023", clip: true, alt: "Sunrise above the cloud line" },
+        { src: "img/otc-tennis.jpg",     place: "Bengaluru",   year: "2023", alt: "Mid-serve, airborne against the court screen" },
+        { src: "img/otc-thrissur.jpg",   place: "Thrissur",    year: "2026", alt: "Parasols and gold ornament at Pooram" },
+        { src: "img/otc-nusapenida.jpg", place: "Nusa Penida", year: "2024", alt: "Snorkelling over a reef" },
+        { src: "img/otc-coldplay.jpg",   place: "Navi Mumbai", year: "2025", alt: "Lit wristbands in a crowd" },
+        { src: "img/otc-jatayu.mp4",     place: "Jatayu",      year: "2025", clip: true, alt: "A giant stone eagle against an overcast sky" },
+        { src: "img/otc-halloween.jpg",  place: "Home",        year: "2022", alt: "A mask and a paper lantern" },
+        { src: "img/otc-maravanthe.jpg", place: "Maravanthe",  year: "2023", alt: "Black rock and a sunset over the sea" },
+        { src: "img/otc-edsheeran.mp4",  place: "Mumbai",      year: "2024", clip: true, alt: "A stage washed in violet" },
+        { src: "img/otc-batur.jpg",      place: "Mount Batur", year: "2024", alt: "A volcano through morning haze" }
+      ];
+
+      // Builds the strip, then prunes it: an item whose file is missing removes
+      // itself and the section goes with it if nothing is left, so a missing
+      // asset can never ship a broken strip. Clips play only while on screen.
+      (function () {
+        var section = document.getElementById("offtheclock");
+        var strip = section && section.querySelector(".otc-strip");
+        if (!strip) return;
+
+        function drop(item) {
+          item.remove();
+          if (!section.querySelector(".otc-item")) section.remove();
+        }
+
+        OFF_THE_CLOCK.forEach(function (entry) {
+          var item = document.createElement("figure");
+          item.className = "otc-item";
+
+          var media;
+          if (entry.clip) {
+            media = document.createElement("video");
+            media.muted = true;
+            media.loop = true;
+            media.playsInline = true;
+            media.setAttribute("playsinline", "");
+            media.preload = "none";
+          } else {
+            media = document.createElement("img");
+            media.loading = "lazy";
+            media.decoding = "async";
+            media.alt = entry.alt || "";
+          }
+          media.className = "otc-media";
+          media.src = entry.src;
+
+          var cap = document.createElement("figcaption");
+          cap.className = "otc-cap mono";
+          var where = document.createElement("span");
+          where.className = "otc-where";
+          where.textContent = entry.place;
+          var when = document.createElement("span");
+          when.textContent = entry.year;
+          cap.appendChild(where);
+          cap.appendChild(when);
+
+          item.appendChild(media);
+          item.appendChild(cap);
+          strip.appendChild(item);
+        });
+
+        section.querySelectorAll(".otc-item").forEach(function (item) {
+          var media = item.querySelector(".otc-media");
+          if (!media) return drop(item);
+          media.addEventListener("error", function () {
+            drop(item);
+          });
+          // Catch a cached failure that landed before the listener attached.
+          // A lazy image still waiting to load reports complete === false, so
+          // this only ever matches one that genuinely failed.
+          if (media.tagName === "IMG" && media.complete && !media.naturalWidth) {
+            drop(item);
+          }
+        });
+
+        var clips = section.querySelectorAll("video.otc-media");
+        if (!clips.length || !("IntersectionObserver" in window)) return;
+        var io = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                var p = entry.target.play();
+                if (p) p.catch(function () {});
+              } else {
+                entry.target.pause();
+              }
+            });
+          },
+          { threshold: 0.4 }
+        );
+        clips.forEach(function (v) {
+          io.observe(v);
         });
       })();
 
