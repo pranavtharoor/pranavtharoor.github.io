@@ -532,6 +532,19 @@
       .otc-item:hover .otc-media {
         filter: grayscale(0) brightness(1);
       }
+      /* The poster is painted underneath the video as well, because the poster
+         frame itself is not shown for the whole wait: play() clears it, and
+         with preload="none" nothing is decoded until after that, so the
+         element paints empty in between — a black flash before the clip
+         starts. A background layer is not tied to that state, so it holds the
+         image until the first frame covers it. Same URL as the poster
+         attribute, which the browser fetches anyway, so it costs no request.
+         Sits inside the element, so it is graded and hovered with the clip. */
+      video.otc-media {
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+      }
       .otc-cap {
         display: flex;
         align-items: baseline;
@@ -1319,7 +1332,11 @@
             // Every clip has a matching -poster.jpg. Without it a clip that is
             // never allowed to play — iOS Low Power Mode refuses even muted
             // autoplay — renders as an empty box instead of a picture.
-            media.poster = entry.src.replace(/\.mp4$/, "-poster.jpg");
+            var poster = entry.src.replace(/\.mp4$/, "-poster.jpg");
+            media.poster = poster;
+            // Also the background layer described in video.otc-media, which is
+            // what actually covers the gap before the first frame.
+            media.style.backgroundImage = 'url("' + poster + '")';
           } else {
             media = document.createElement("img");
             media.loading = "lazy";
