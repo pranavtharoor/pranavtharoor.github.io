@@ -644,6 +644,13 @@
       }
       .foot-bar .js-clock {
         color: var(--bone);
+        transition: color 0.45s var(--ease);
+      }
+      /* The way through to /surface. No pointer cursor and no underline —
+         a hover tint is the only tell, so it stays invisible to anyone who
+         is not already poking at things. */
+      .foot-bar .js-clock:hover {
+        color: var(--gold);
       }
 
       /* ————— SCROLL REVEALS ————— */
@@ -1437,6 +1444,16 @@
         }
         tick();
         setInterval(tick, 30000);
+
+        // Off the clock, literally: the footer clock is the way through to the
+        // experimental WebGL build at /surface. Deliberately not an <a> — no
+        // href in the source, not in the tab order, nothing for a crawler to
+        // follow. /surface is noindex too, so it stays unlisted.
+        els.forEach(function (el) {
+          el.addEventListener("click", function () {
+            window.location.href = "/surface/";
+          });
+        });
       })();
     </script>
   </body>
