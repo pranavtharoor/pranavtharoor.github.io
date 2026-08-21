@@ -22,7 +22,6 @@ This is a single-page static site. All files are served as-is by GitHub Pages.
 
 - **`index.html`** — The entire site, fully self-contained: all markup, one inline `<style>`, and inline `<script>` blocks at the end of `<body>`. There are no external CSS or JS files.
 - **`img/IMG_1265.MP4`** — Portrait lake video used as the full-bleed hero background.
-- **`img/me-min.png`** — Profile photo. Not used by `index.html`; kept as a candidate `og:image` source.
 - **`img/og.jpg`** — 1200×630 social card: a mirrored, graded frame of the hero footage with the masthead set in real Fraunces. `og:image` is absolute and carries a `?v=` — bump it whenever the file is replaced or Facebook and LinkedIn will keep serving the cached copy. Fraunces is not installed locally, so regenerating this means downloading the TTFs from Google Fonts first; otherwise ffmpeg silently falls back to Georgia.
 - **`404.html`** — Served automatically by GitHub Pages. Standalone copy of the design tokens, grain, and clock; it shares nothing with `index.html`, so a token change needs applying in both.
 
