@@ -959,7 +959,11 @@
         say.style.transform = `translateY(calc(-50% + ${(1 - sayIn) * 26}px))`;
 
         // ——— rails ———
-        const railsOn = p > 0.04 && p < 0.94;
+        // Off once the Work panel takes over: it scrolls its own job list
+        // independently of the page's scroll-jacked progress, so entries can
+        // land directly under these fixed corner labels — the two interleave,
+        // since glyphs are opaque but the gaps between them are not.
+        const railsOn = p > 0.04 && p < A.workIn[0];
         rails.forEach((r) => r.classList.toggle("on", railsOn));
         prog.classList.toggle("on", p > A.travel[0] - 0.02 && p < A.travel[1] + 0.02);
         progBar.style.width = (travel * 100).toFixed(2) + "%";
