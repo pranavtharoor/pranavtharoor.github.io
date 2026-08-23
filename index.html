@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<!-- data-writing is the switch for the Writing section: "off" ships without
+     it, "on" ships it. Nothing else needs changing — the indices renumber
+     themselves and Mount Batur moves back into Off the Clock when it is off. -->
+<html lang="en" data-writing="off">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -161,6 +164,24 @@
         background: rgba(13, 13, 15, 0.35);
         backdrop-filter: blur(16px) saturate(140%);
         -webkit-backdrop-filter: blur(16px) saturate(140%);
+        transition: background-color 0.5s var(--ease), backdrop-filter 0.5s var(--ease);
+      }
+      /* One state, driven by whether the masthead is still on screen — the bar
+         and the small name arrive together as it passes behind.
+         Keep them on the same trigger. Hanging the bar off the hero instead
+         left a stretch where the masthead had gone, the small name was in, and
+         the hero's own role line scrolled under a nav with nothing behind it.
+         The bar is only dropped in the first place because the video carries
+         its own top gradient — 0.72 ink at the top, out by 32%, so still 0.56
+         at the bar's 68px, ample ground for the links. Laying the bar's 0.35
+         over that took it to 0.71, making the image 35% dimmer above the line
+         than below and putting a hard horizontal edge across the frame. Unlike
+         the veil gradients that edge cannot be feathered: backdrop-filter
+         stops dead where the element stops. */
+      .nav--masthead {
+        background: transparent;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
       }
       .nav-name {
         font-family: var(--serif);
@@ -169,6 +190,16 @@
         letter-spacing: 0.01em;
         color: var(--bone);
         text-decoration: none;
+        transition: opacity 0.5s var(--ease), visibility 0.5s var(--ease);
+      }
+      /* Held back while the masthead is on screen — otherwise the name is set
+         twice at once. visibility, not display: the nav is a space-between
+         flex row, so removing the name from layout would slide the links left
+         and back every time it toggles. It also drops out of the tab order
+         while hidden, which opacity alone would not do. */
+      .nav--masthead .nav-name {
+        opacity: 0;
+        visibility: hidden;
       }
       .nav-links {
         display: flex;
@@ -245,19 +276,18 @@
         height: 100%;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
         padding: 100px 5vw 7vh;
       }
-
-      .hero-top {
-        display: flex;
-        justify-content: space-between;
-        color: rgba(234, 231, 225, 0.72);
-        opacity: 0;
-        animation: fade-in 1s ease 0.9s forwards;
-      }
-      .hero-top .mono span {
-        color: var(--bone);
+      /* Two auto margins rather than justify-content, because the frame has
+         two children now and space-between would pin the masthead to the top
+         padding — a ~250px jump up the page. Auto margins are resolved before
+         justify-content and split the free space evenly between them, which
+         reproduces what space-between gave across three children: an equal gap
+         above the masthead and below it, both scaling with viewport height.
+         Measured, the masthead lands within 9px of where it used to sit. */
+      .hero-name,
+      .hero-bottom {
+        margin-top: auto;
       }
 
       .hero-name {
@@ -305,20 +335,11 @@
       .hero-role em {
         color: var(--gold);
       }
-      .hero-aside {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        gap: 0.6rem;
-      }
-      .scroll-cue {
-        color: var(--muted);
-        text-decoration: none;
-        transition: color 0.2s ease;
+      /* The fourth corner. Dimmer than the role beside it so the pair reads as
+         statement and marginal note rather than two equal lines. */
+      .hero-where {
+        color: rgba(234, 231, 225, 0.72);
         white-space: nowrap;
-      }
-      .scroll-cue:hover {
-        color: var(--bone);
       }
 
       @keyframes rise {
@@ -493,6 +514,226 @@
         font-weight: 300;
         color: var(--bone);
         line-height: 2.1;
+      }
+
+      /* ————— FEATURE FLAG —————
+         The script removes the section outright, but it runs at the end of the
+         body, and #writing is two screens tall — so CSS is what stops it
+         painting and reflowing first. Hiding it here also means the plates are
+         never fetched (a lazy image inside display:none does not load), and
+         that the flag still holds with JavaScript off. */
+      [data-writing="off"] #writing,
+      [data-writing="off"] .nav-writing {
+        display: none;
+      }
+
+      /* ————— WRITING —————
+         The Mount Batur photograph is used the way the hero video is: as
+         environment, never captioned. It is three plates of the same frame —
+         the original, an inpainted backfill, and a cut-out foreground — panned
+         at different rates, so the valley recedes while the ridge, the huts and
+         the people hold their place. Everything visible is from the photograph.
+
+         #writing sets padding: 0 on purpose. The base `section` rule adds 5vw
+         down both sides, which on a full-bleed image reads as two black gaps;
+         the horizontal padding belongs on .wr-content instead. */
+      #writing {
+        padding: 0;
+      }
+      .wr-stage {
+        position: relative;
+        --p: 0;
+        --mx: 0;
+        --my: 0;
+      }
+      .wr-viewport {
+        position: sticky;
+        top: 0;
+        height: 100svh;
+        overflow: hidden;
+        background: var(--ink);
+      }
+      /* isolate, or .wr-atmos would soft-light against the page behind it */
+      .wr-scene {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        isolation: isolate;
+      }
+      .wr-plate {
+        position: absolute;
+        inset: -4%;
+        width: 108%;
+        height: 108%;
+        object-fit: cover;
+        object-position: 50% calc(38% + (var(--p) * 18%));
+        will-change: transform, object-position, opacity;
+      }
+      /* The untouched frame is the opaque ground the two plates fade in over,
+         and it holds full opacity until .wr-back has completely covered it.
+         Do not turn this back into a symmetric crossfade: stacked over --ink
+         two half-faded layers composite to a + b(1 - a), not to 1, so the sky
+         and the far ridge sank to ~35% brightness and lifted back — a dark
+         pulse landing exactly as the first line of type arrived. The
+         foreground hid it, being a third layer on top. Nothing here fades out
+         until something opaque is already covering it.
+
+         .wr-back is a full-frame yuv420p WebP with no alpha, which is what
+         makes it safe to treat as that cover. */
+      .wr-original {
+        opacity: clamp(0, calc(1 - ((var(--p) - 0.1) * 20)), 1);
+        transform: scale(1.025);
+      }
+      .wr-back {
+        opacity: clamp(0, calc(var(--p) * 14), 1);
+        transform: scale(1.025)
+          translate3d(calc(var(--mx) * -0.7%), calc(var(--my) * -0.4%), 0);
+      }
+      .wr-fore {
+        opacity: clamp(0, calc(var(--p) * 18), 1);
+        object-position: 50% calc(38% + (var(--p) * 34%));
+        transform: scale(1.07)
+          translate3d(calc(var(--mx) * 2.6%), calc(-2vh + (var(--my) * 1.7%)), 0);
+        filter: saturate(1.03) contrast(1.02);
+      }
+      /* A plate that 404s would leave a black hole, so fall back to the flat
+         original — which is already what the first frame shows. */
+      .wr-flat .wr-back,
+      .wr-flat .wr-fore {
+        display: none;
+      }
+      .wr-flat .wr-original {
+        opacity: 1;
+      }
+      .wr-atmos {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        pointer-events: none;
+        background:
+          radial-gradient(ellipse 75% 45% at 52% calc(93% - (var(--p) * 38%)), rgba(255, 232, 201, 0.13), transparent 66%),
+          linear-gradient(to bottom, rgba(4, 10, 15, 0.06), transparent 32%, rgba(3, 7, 7, 0.28));
+        mix-blend-mode: soft-light;
+      }
+      /* Held back at the start so the opening is pure photograph, and faded in
+         by the time the first line of type arrives over it. */
+      .wr-scrim {
+        position: absolute;
+        inset: 0;
+        z-index: 3;
+        pointer-events: none;
+        background: linear-gradient(
+          to bottom,
+          rgba(13, 13, 15, 0.34),
+          rgba(13, 13, 15, 0.58)
+        );
+        opacity: clamp(0, calc((var(--p) - 0.06) * 5), 1);
+      }
+      /* Long eased ramps top and bottom, so the photograph resolves out of the
+         page instead of butting against it.
+
+         The shape matters more than the length here. A two-stop gradient falls
+         linearly and lands on zero with the slope still steep, so the eye
+         finds the exact line where it ends — which is what read as a hard edge
+         no matter how far the old 26% ramp was stretched. These follow
+         (1 - t)^2.5: a quick shoulder near the edge, then a long tail that
+         arrives at zero with zero slope. The tail is the part that reads as
+         feathered. Area under the curve is 1/3.5, so 46% of these carries the
+         same total ink as 26% of a linear ramp — longer and softer without
+         actually darkening more of the picture.
+
+         Two layers rather than one stop list, so each edge tunes separately;
+         `to top` measures the second from the bottom, which lets it reuse the
+         same stops mirrored. They must not overlap — 46 + 40 < 100.
+
+         Banding is handled by the global .grain sitting above this at 0.05,
+         which dithers the ramp. Remove the grain and these will show steps. */
+      .wr-veil {
+        position: absolute;
+        inset: 0;
+        z-index: 4;
+        pointer-events: none;
+        background:
+          linear-gradient(
+            to bottom,
+            rgba(13, 13, 15, 1) 0%,
+            rgba(13, 13, 15, 0.857) 2.8%,
+            rgba(13, 13, 15, 0.727) 5.5%,
+            rgba(13, 13, 15, 0.609) 8.3%,
+            rgba(13, 13, 15, 0.487) 11.5%,
+            rgba(13, 13, 15, 0.381) 14.7%,
+            rgba(13, 13, 15, 0.279) 18.4%,
+            rgba(13, 13, 15, 0.195) 22.1%,
+            rgba(13, 13, 15, 0.128) 25.8%,
+            rgba(13, 13, 15, 0.078) 29.4%,
+            rgba(13, 13, 15, 0.042) 33.1%,
+            rgba(13, 13, 15, 0.018) 36.8%,
+            rgba(13, 13, 15, 0.005) 40.5%,
+            rgba(13, 13, 15, 0) 46%
+          ),
+          linear-gradient(
+            to top,
+            rgba(13, 13, 15, 1) 0%,
+            rgba(13, 13, 15, 0.857) 2.4%,
+            rgba(13, 13, 15, 0.727) 4.8%,
+            rgba(13, 13, 15, 0.609) 7.2%,
+            rgba(13, 13, 15, 0.487) 10%,
+            rgba(13, 13, 15, 0.381) 12.8%,
+            rgba(13, 13, 15, 0.279) 16%,
+            rgba(13, 13, 15, 0.195) 19.2%,
+            rgba(13, 13, 15, 0.128) 22.4%,
+            rgba(13, 13, 15, 0.078) 25.6%,
+            rgba(13, 13, 15, 0.042) 28.8%,
+            rgba(13, 13, 15, 0.018) 32%,
+            rgba(13, 13, 15, 0.005) 35.2%,
+            rgba(13, 13, 15, 0) 40%
+          );
+      }
+      /* Pulled back over the pinned viewport so the type scrolls independently
+         of the picture. Deliberately not display:flex — the articles are block
+         children and a stray flex row is exactly how this broke the first time. */
+      .wr-content {
+        position: relative;
+        z-index: 2;
+        margin-top: -100svh;
+        padding: 112vh 5vw 46vh;
+      }
+      .wr-list {
+        list-style: none;
+        border-top: 1px solid var(--line);
+        max-width: 64rem;
+      }
+      .wr-item {
+        display: grid;
+        grid-template-columns: 3.5rem 1fr auto;
+        gap: 2.5rem;
+        align-items: baseline;
+        padding: clamp(2.4rem, 6vh, 4rem) 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .wr-idx {
+        color: var(--gold);
+        opacity: 0.85;
+      }
+      .wr-title {
+        font-family: var(--serif);
+        font-weight: 360;
+        font-size: clamp(1.4rem, 2.3vw, 2rem);
+        line-height: 1.15;
+        letter-spacing: -0.005em;
+      }
+      /* --muted is tuned for flat --ink and goes murky over a photograph */
+      .wr-blurb {
+        margin-top: 0.7rem;
+        color: rgba(234, 231, 225, 0.66);
+        font-size: 0.97rem;
+        line-height: 1.75;
+        max-width: 56ch;
+      }
+      .wr-state {
+        color: rgba(234, 231, 225, 0.5);
+        white-space: nowrap;
+        justify-self: end;
       }
 
       /* ————— OFF THE CLOCK ————— */
@@ -673,13 +914,11 @@
         .grain,
         .marquee-track,
         .hero-video,
-        .hero-top,
         .hero-bottom,
         .hero-name .line-inner {
           animation: none;
         }
         .hero-video,
-        .hero-top,
         .hero-bottom {
           opacity: 1;
         }
@@ -691,8 +930,28 @@
           transform: none;
           transition: none;
         }
+        /* both still hand over, just without the crossfade */
+        nav,
+        .nav-name {
+          transition: none;
+        }
         .otc-media {
           transition: none;
+        }
+        /* --p never leaves 0, so the plates hold the untouched frame. Unpin the
+           viewport too, or the section is two screens of dead scroll for an
+           image that no longer moves. */
+        .wr-viewport {
+          position: relative;
+          height: 58svh;
+        }
+        .wr-content {
+          margin-top: 0;
+          padding-top: clamp(4rem, 9vh, 7rem);
+          padding-bottom: clamp(4rem, 9vh, 7rem);
+        }
+        .wr-scrim {
+          opacity: 0;
         }
       }
 
@@ -713,6 +972,10 @@
           grid-template-columns: 1fr;
           align-items: start;
         }
+        .wr-item {
+          grid-template-columns: 3rem 1fr auto;
+          gap: 1.25rem 1.5rem;
+        }
       }
       @media (max-width: 640px) {
         .nav-links {
@@ -727,17 +990,12 @@
         .hero-name .line--2 {
           margin-left: 10vw;
         }
-        .hero-top,
+        /* stacks the location under the role rather than squeezing both onto
+           one line — there is no room for a right-hand corner on a phone */
         .hero-bottom {
           flex-direction: column;
           gap: 0.6rem;
           align-items: flex-start;
-        }
-        .hero-aside {
-          align-items: flex-start;
-        }
-        .scroll-cue {
-          display: none;
         }
         .job {
           grid-template-columns: 1fr auto;
@@ -751,6 +1009,27 @@
         .caps {
           grid-template-columns: 1fr;
           gap: 2.5rem;
+        }
+        .wr-item {
+          grid-template-columns: 1fr auto;
+        }
+        .wr-idx {
+          display: none;
+        }
+        /* a phone screen is taller than it is wide, so the same lead-in in vh
+           is a much longer thumb-scroll — shorten it */
+        .wr-content {
+          padding-top: 84vh;
+          padding-bottom: 30vh;
+        }
+        /* on a narrow screen the type runs the full width of the frame, so it
+           has no dark ground to sit on when the lit foreground pans up */
+        .wr-scrim {
+          background: linear-gradient(
+            to bottom,
+            rgba(13, 13, 15, 0.4),
+            rgba(13, 13, 15, 0.68)
+          );
         }
         .foot-bar {
           flex-direction: column;
@@ -776,12 +1055,14 @@
         nav,
         .marquee,
         #offtheclock,
+        /* unpublished drafts are not CV material, and the backdrop is a screen
+           effect that would print as a grey slab */
+        #writing,
         .hero-video,
-        .scroll-cue,
         .foot-bar,
         .contact-giant .arrow,
         /* the numbering is a screen device, and hiding Off the Clock would
-           leave it reading 01, 02, 04 on paper */
+           leave it reading 01, 02, 05 on paper */
         .sec-idx,
         .contact-kicker {
           display: none !important;
@@ -808,23 +1089,12 @@
           height: auto !important;
           padding: 0 0 5mm !important;
         }
-        .hero-top,
-        .hero-bottom {
-          opacity: 1 !important;
-          animation: none !important;
-          color: #111 !important;
-        }
-        .hero-top {
-          display: flex !important;
-          justify-content: space-between !important;
-          gap: 10mm;
-        }
+        /* block, so the location drops under the role at the left margin
+           instead of sitting out in the right corner as it does on screen */
         .hero-bottom {
           display: block !important;
-        }
-        /* on screen this is --bone for contrast against the film; on white it
-           would all but vanish */
-        .hero-top .mono span {
+          opacity: 1 !important;
+          animation: none !important;
           color: #111 !important;
         }
         .hero-name {
@@ -866,6 +1136,9 @@
         .job-desc,
         .job-date,
         .job-co,
+        /* sets its own --bone-alpha colour, so inheriting #111 from
+           .hero-bottom does not reach it — on white it would all but vanish */
+        .hero-where,
         .contact-note {
           color: #333 !important;
         }
@@ -952,11 +1225,14 @@
     <div class="grain" aria-hidden="true"></div>
 
     <!-- NAV -->
-    <nav>
+    <!-- starts hidden, since the page opens on the masthead — set here rather
+         than by the script so the name cannot flash before the first paint -->
+    <nav class="nav--masthead">
       <a class="nav-name" href="#hero">Pranav Tharoor</a>
       <ul class="nav-links">
         <li><a href="#experience">Experience</a></li>
         <li><a href="#skills">Capabilities</a></li>
+        <li class="nav-writing"><a href="#writing">Writing</a></li>
         <li><a href="#offtheclock">Off the Clock</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
@@ -972,10 +1248,6 @@
         </video>
       </div>
       <div class="hero-frame">
-        <div class="hero-top">
-          <span class="mono">( Software Engineer — <span>Apple</span> )</span>
-          <span class="mono">Bangalore, India</span>
-        </div>
         <h1 class="hero-name">
           <span class="line"><span class="line-inner">Pranav</span></span>
           <span class="line line--2"><span class="line-inner">Tharoor</span></span>
@@ -985,9 +1257,7 @@
             Building generative AI systems on Apple's
             <em>Artificial Intelligence &amp; Data Platforms</em> team.
           </p>
-          <div class="hero-aside">
-            <a class="scroll-cue mono" href="#about">( Scroll )</a>
-          </div>
+          <span class="hero-where mono">Bangalore, India</span>
         </div>
       </div>
     </header>
@@ -1159,11 +1429,75 @@
       </div>
     </section>
 
+    <!-- WRITING -->
+    <section id="writing">
+      <div class="wr-stage">
+        <div class="wr-viewport">
+          <!-- environment, not content — the same role the hero video plays,
+               so it is unlabelled and hidden from the accessibility tree -->
+          <div class="wr-scene" aria-hidden="true">
+            <img class="wr-plate wr-original" src="img/otc-batur.jpg" alt="" loading="lazy" decoding="async" />
+            <img class="wr-plate wr-back" src="img/batur-backfill.webp" alt="" loading="lazy" decoding="async" />
+            <img class="wr-plate wr-fore" src="img/batur-foreground.webp" alt="" loading="lazy" decoding="async" />
+            <div class="wr-atmos"></div>
+            <div class="wr-scrim"></div>
+            <div class="wr-veil"></div>
+          </div>
+        </div>
+        <div class="wr-content">
+          <div class="sec-head" data-reveal>
+            <h2 class="sec-title">Writing</h2>
+            <span class="sec-idx mono">( 03 )</span>
+          </div>
+          <ol class="wr-list">
+            <li class="wr-item" data-reveal>
+              <span class="wr-idx mono">01</span>
+              <div>
+                <h3 class="wr-title">The AI Agent Protocol Stack</h3>
+                <p class="wr-blurb">
+                  MCP, function calling, and the half-dozen competing
+                  conventions underneath them — and what an interoperability
+                  layer for agents would actually have to guarantee.
+                </p>
+              </div>
+              <span class="wr-state mono">Draft</span>
+            </li>
+            <li class="wr-item" data-reveal>
+              <span class="wr-idx mono">02</span>
+              <div>
+                <h3 class="wr-title">Why Agents Need Fewer Tools</h3>
+                <p class="wr-blurb">
+                  Every tool you add widens the space the model has to reason
+                  through. Notes on why the most reliable agents I've built
+                  were also the smallest.
+                </p>
+              </div>
+              <span class="wr-state mono">Draft</span>
+            </li>
+            <li class="wr-item" data-reveal>
+              <span class="wr-idx mono">03</span>
+              <div>
+                <h3 class="wr-title">
+                  Building Interfaces for AI That Don't Feel Like Chat
+                </h3>
+                <p class="wr-blurb">
+                  A text box is the cheapest interface to ship and almost never
+                  the right one. On designing for systems that are capable but
+                  not deterministic.
+                </p>
+              </div>
+              <span class="wr-state mono">Draft</span>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
     <!-- OFF THE CLOCK -->
     <section id="offtheclock">
       <div class="sec-head" data-reveal>
         <h2 class="sec-title">Off the Clock</h2>
-        <span class="sec-idx mono">( 03 )</span>
+        <span class="sec-idx mono">( 04 )</span>
       </div>
       <!-- Items are built from the OFF_THE_CLOCK list in the script below. -->
       <div class="otc-strip" data-reveal></div>
@@ -1172,7 +1506,7 @@
     <!-- CONTACT -->
     <footer id="contact">
       <p class="contact-kicker mono" data-reveal>
-        <span class="sec-idx">( 04 )</span> — Get in touch
+        <span class="sec-idx">( 05 )</span> — Get in touch
       </p>
       <a
         class="contact-giant"
@@ -1199,6 +1533,31 @@
     </footer>
 
     <script>
+      // ————— FEATURE FLAG: WRITING —————
+      // Runs first, so everything downstream sees the finished DOM: the
+      // backdrop observers below bail on a missing .wr-stage, and the strip is
+      // built from an array this can still amend.
+      var WRITING_ON = document.documentElement.dataset.writing === "on";
+
+      (function () {
+        if (!WRITING_ON) {
+          // CSS has already hidden these; drop them so the observers never
+          // attach and the section cannot be reached by an anchor either.
+          var section = document.getElementById("writing");
+          if (section) section.remove();
+          var link = document.querySelector(".nav-writing");
+          if (link) link.remove();
+        }
+
+        // Numbered from the DOM rather than trusted from the markup, so
+        // flipping the flag cannot leave the rest reading 01, 02, 04, 05.
+        // This also retires the standing trap of having to renumber by hand
+        // every time a section is added or moved.
+        document.querySelectorAll(".sec-idx").forEach(function (el, i) {
+          el.textContent = "( " + String(i + 1).padStart(2, "0") + " )";
+        });
+      })();
+
       // Autoplay — mobile Safari/Chrome defer or block play() in several
       // situations (Low Power Mode, Data Saver, metadata not ready), so
       // retry on media-ready events and on the first user interaction.
@@ -1235,6 +1594,36 @@
         });
       })();
 
+      // The nav's whole hero state — no bar, no small name — hangs off one
+      // question: is the masthead still on screen? Watching the masthead
+      // itself rather than #hero keeps the two halves of that state in sync,
+      // and stays right if the hero's height or padding ever changes.
+      //
+      // The class is set in the markup rather than added here: the observer
+      // fires a frame late, and the page nearly always opens on the hero, so
+      // defaulting to the hero state is what avoids a flash. A browser that
+      // cannot observe has it removed instead — a nav that is legible in the
+      // wrong place beats one that is transparent over scrolling content.
+      (function () {
+        var nav = document.querySelector("nav");
+        var masthead = document.querySelector(".hero-name");
+        if (!nav || !masthead) return;
+
+        if (!("IntersectionObserver" in window)) {
+          nav.classList.remove("nav--masthead");
+          return;
+        }
+
+        new IntersectionObserver(
+          function (entries) {
+            nav.classList.toggle("nav--masthead", entries[0].isIntersecting);
+          },
+          // root pulled in by the bar's own height, read rather than
+          // hardcoded, so the flip lands as the masthead passes behind it
+          { rootMargin: -nav.offsetHeight + "px 0px 0px 0px", threshold: 0 }
+        ).observe(masthead);
+      })();
+
       // Hero video parallax — moves slower than scroll for a cinematic anchored feel
       (function () {
         var video = document.querySelector(".hero-video video");
@@ -1266,6 +1655,74 @@
         );
         window.addEventListener("resize", update, { passive: true });
         update();
+      })();
+
+      // ————— WRITING BACKDROP —————
+      // --p is the section's own scroll progress, measured from its box rather
+      // than from window.scrollY, so nothing here cares where on the page the
+      // section ends up sitting.
+      (function () {
+        var stage = document.querySelector(".wr-stage");
+        if (!stage) return;
+
+        stage.querySelectorAll(".wr-back, .wr-fore").forEach(function (img) {
+          img.addEventListener("error", function () {
+            stage.classList.add("wr-flat");
+          });
+        });
+
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+          return;
+
+        var ticking = false;
+        function update() {
+          var rect = stage.getBoundingClientRect();
+          var travel = rect.height - window.innerHeight;
+          var p = travel > 0 ? -rect.top / travel : 0;
+          stage.style.setProperty("--p", Math.min(1, Math.max(0, p)).toFixed(4));
+          ticking = false;
+        }
+        window.addEventListener(
+          "scroll",
+          function () {
+            if (!ticking) {
+              requestAnimationFrame(update);
+              ticking = true;
+            }
+          },
+          { passive: true }
+        );
+        window.addEventListener("resize", update, { passive: true });
+        update();
+
+        // Cursor tilt, but only while the section is on screen — the rest of
+        // the page has no use for these two properties, and a pointermove
+        // handler that runs the whole way down the document is wasted work.
+        var live = !("IntersectionObserver" in window);
+        if (!live) {
+          new IntersectionObserver(function (entries) {
+            live = entries[0].isIntersecting;
+            if (!live) {
+              stage.style.setProperty("--mx", 0);
+              stage.style.setProperty("--my", 0);
+            }
+          }).observe(stage);
+        }
+        window.addEventListener(
+          "pointermove",
+          function (event) {
+            if (!live) return;
+            stage.style.setProperty(
+              "--mx",
+              ((event.clientX / window.innerWidth - 0.5) * 2).toFixed(3)
+            );
+            stage.style.setProperty(
+              "--my",
+              ((event.clientY / window.innerHeight - 0.5) * 2).toFixed(3)
+            );
+          },
+          { passive: true }
+        );
       })();
 
       // Scroll reveals
@@ -1307,9 +1764,20 @@
         { src: "img/otc-jatayu.mp4",     place: "Jatayu",      year: "2025", clip: true, alt: "A giant stone eagle against an overcast sky" },
         { src: "img/otc-halloween.jpg",  place: "Home",        year: "2022", alt: "A mask and a paper lantern" },
         { src: "img/otc-maravanthe.jpg", place: "Maravanthe",  year: "2023", alt: "Black rock and a sunset over the sea" },
-        { src: "img/otc-edsheeran.mp4",  place: "Mumbai",      year: "2024", clip: true, alt: "A stage washed in violet" },
-        { src: "img/otc-batur.jpg",      place: "Mount Batur", year: "2024", alt: "A volcano through morning haze" }
+        { src: "img/otc-edsheeran.mp4",  place: "Mumbai",      year: "2024", clip: true, alt: "A stage washed in violet" }
       ];
+
+      // Mount Batur belongs to whichever section is actually shipping. With
+      // Writing on it is that section's backdrop, unlabelled, and a captioned
+      // copy in the strip would give away that it is a photograph of a place.
+      // With Writing off there is no backdrop, so it comes back here rather
+      // than dropping off the site altogether.
+      if (!WRITING_ON) {
+        OFF_THE_CLOCK.push({
+          src: "img/otc-batur.jpg", place: "Mount Batur", year: "2024",
+          alt: "A volcano through morning haze"
+        });
+      }
 
       // Builds the strip, then prunes it: an item whose file is missing removes
       // itself and the section goes with it if nothing is left, so a missing
