@@ -805,44 +805,81 @@
         position: relative;
         z-index: 2;
         margin-top: -100svh;
-        padding: 112vh 5vw 46vh;
+        padding: 90vh 5vw 46vh;
       }
+      /* Editorial cards over the existing pinned/parallax mountain scene. */
       .wr-list {
         list-style: none;
+        display: flex;
+        gap: clamp(1.25rem, 2.5vw, 2.25rem);
         border-top: 1px solid var(--line);
-        max-width: 64rem;
+        padding-top: 3rem;
+        margin-right: -5vw;
+        padding-right: 5vw;
+        overflow-x: auto;
+        /* Declared, not left to default. `visible` computes to `auto` the
+           moment the other axis is not visible, so overflow-x alone quietly
+           makes this vertically scrollable too — and then anything that
+           overhangs by a pixel becomes a stray vertical drag inside the
+           strip. That is what the reveal's 28px translate was doing. */
+        overflow-y: hidden;
+        overscroll-behavior-x: contain;
+        scroll-snap-type: x proximity;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+      .wr-list::-webkit-scrollbar {
+        display: none;
       }
       .wr-item {
-        display: grid;
-        grid-template-columns: 3.5rem 1fr auto;
-        gap: 2.5rem;
+        flex: 0 0 auto;
+        width: clamp(320px, 34vw, 470px);
+        scroll-snap-align: start;
+        padding: 0;
+      }
+      .wr-media {
+        display: block;
+        width: 100%;
+        aspect-ratio: 16 / 10;
+        object-fit: cover;
+        filter: grayscale(0.3) brightness(0.72) contrast(1.06);
+        transition: filter 0.55s var(--ease), transform 0.7s var(--ease);
+      }
+      .wr-item:hover .wr-media {
+        filter: grayscale(0) brightness(0.9) contrast(1.02);
+        transform: scale(1.018);
+      }
+      .wr-meta {
+        display: flex;
         align-items: baseline;
-        padding: clamp(2.4rem, 6vh, 4rem) 0;
-        border-bottom: 1px solid var(--line);
+        justify-content: space-between;
+        gap: 1rem;
+        margin-top: 0.95rem;
       }
       .wr-idx {
         color: var(--gold);
         opacity: 0.85;
       }
+      .wr-type {
+        color: rgba(234, 231, 225, 0.5);
+      }
       .wr-title {
+        margin-top: 0.65rem;
         font-family: var(--serif);
         font-weight: 360;
-        font-size: clamp(1.4rem, 2.3vw, 2rem);
+        font-size: clamp(1.55rem, 2.4vw, 2.25rem);
         line-height: 1.15;
         letter-spacing: -0.005em;
       }
-      /* --muted is tuned for flat --ink and goes murky over a photograph */
       .wr-blurb {
         margin-top: 0.7rem;
         color: rgba(234, 231, 225, 0.66);
-        font-size: 0.97rem;
-        line-height: 1.75;
-        max-width: 56ch;
+        font-size: 0.95rem;
+        line-height: 1.7;
+        max-width: 48ch;
       }
       .wr-state {
         color: rgba(234, 231, 225, 0.5);
-        white-space: nowrap;
-        justify-self: end;
       }
 
       /* ————— OFF THE CLOCK ————— */
@@ -1051,17 +1088,8 @@
         /* --p never leaves 0, so the plates hold the untouched frame. Unpin the
            viewport too, or the section is two screens of dead scroll for an
            image that no longer moves. */
-        .wr-viewport {
-          position: relative;
-          height: 58svh;
-        }
-        .wr-content {
-          margin-top: 0;
-          padding-top: clamp(4rem, 9vh, 7rem);
-          padding-bottom: clamp(4rem, 9vh, 7rem);
-        }
-        .wr-scrim {
-          opacity: 0;
+        .wr-media {
+          transition: none;
         }
       }
 
@@ -1083,8 +1111,7 @@
           align-items: start;
         }
         .wr-item {
-          grid-template-columns: 3rem 1fr auto;
-          gap: 1.25rem 1.5rem;
+          width: min(72vw, 400px);
         }
       }
       @media (max-width: 640px) {
@@ -1121,25 +1148,7 @@
           gap: 2.5rem;
         }
         .wr-item {
-          grid-template-columns: 1fr auto;
-        }
-        .wr-idx {
-          display: none;
-        }
-        /* a phone screen is taller than it is wide, so the same lead-in in vh
-           is a much longer thumb-scroll — shorten it */
-        .wr-content {
-          padding-top: 84vh;
-          padding-bottom: 30vh;
-        }
-        /* on a narrow screen the type runs the full width of the frame, so it
-           has no dark ground to sit on when the lit foreground pans up */
-        .wr-scrim {
-          background: linear-gradient(
-            to bottom,
-            rgba(13, 13, 15, 0.4),
-            rgba(13, 13, 15, 0.68)
-          );
+          width: 82vw;
         }
         .foot-bar {
           flex-direction: column;
@@ -1589,44 +1598,71 @@
             <h2 class="sec-title">Writing</h2>
             <span class="sec-idx mono">( 03 )</span>
           </div>
-          <ol class="wr-list">
-            <li class="wr-item" data-reveal>
-              <span class="wr-idx mono">01</span>
-              <div>
-                <h3 class="wr-title">The AI Agent Protocol Stack</h3>
-                <p class="wr-blurb">
-                  MCP, function calling, and the half-dozen competing
-                  conventions underneath them — and what an interoperability
-                  layer for agents would actually have to guarantee.
-                </p>
+          <!-- data-reveal belongs on the strip, not the cards — same as
+               .otc-strip. On a card it never fires for anything off the right
+               edge, because a horizontal scroller's overflow never intersects
+               the viewport, so those cards stay at opacity 0 until the strip
+               is dragged. Its translateY was also the strip's phantom
+               vertical scroll. -->
+          <ol class="wr-list" data-reveal>
+            <li class="wr-item">
+              <img
+                class="wr-media"
+                src="https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=1200&q=82"
+                alt=""
+                loading="lazy"
+                decoding="async"
+              />
+              <div class="wr-meta">
+                <span class="wr-idx mono">01</span>
+                <span class="wr-type mono">ESSAY · DRAFT</span>
               </div>
-              <span class="wr-state mono">Draft</span>
+              <h3 class="wr-title">The AI Agent Protocol Stack</h3>
+              <p class="wr-blurb">
+                MCP, function calling, and the half-dozen competing conventions
+                underneath them — and what an interoperability layer for agents
+                would actually have to guarantee.
+              </p>
             </li>
-            <li class="wr-item" data-reveal>
-              <span class="wr-idx mono">02</span>
-              <div>
-                <h3 class="wr-title">Why Agents Need Fewer Tools</h3>
-                <p class="wr-blurb">
-                  Every tool you add widens the space the model has to reason
-                  through. Notes on why the most reliable agents I've built were
-                  also the smallest.
-                </p>
+            <li class="wr-item">
+              <img
+                class="wr-media"
+                src="https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1200&q=82"
+                alt=""
+                loading="lazy"
+                decoding="async"
+              />
+              <div class="wr-meta">
+                <span class="wr-idx mono">02</span>
+                <span class="wr-type mono">NOTE · DRAFT</span>
               </div>
-              <span class="wr-state mono">Draft</span>
+              <h3 class="wr-title">Why Agents Need Fewer Tools</h3>
+              <p class="wr-blurb">
+                Every tool you add widens the space the model has to reason
+                through. Notes on why the most reliable agents I've built were
+                also the smallest.
+              </p>
             </li>
-            <li class="wr-item" data-reveal>
-              <span class="wr-idx mono">03</span>
-              <div>
-                <h3 class="wr-title">
-                  Building Interfaces for AI That Don't Feel Like Chat
-                </h3>
-                <p class="wr-blurb">
-                  A text box is the cheapest interface to ship and almost never
-                  the right one. On designing for systems that are capable but
-                  not deterministic.
-                </p>
+            <li class="wr-item">
+              <img
+                class="wr-media"
+                src="https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?auto=format&fit=crop&w=1200&q=82"
+                alt=""
+                loading="lazy"
+                decoding="async"
+              />
+              <div class="wr-meta">
+                <span class="wr-idx mono">03</span>
+                <span class="wr-type mono">ESSAY · DRAFT</span>
               </div>
-              <span class="wr-state mono">Draft</span>
+              <h3 class="wr-title">
+                Building Interfaces for AI That Don't Feel Like Chat
+              </h3>
+              <p class="wr-blurb">
+                A text box is the cheapest interface to ship and almost never
+                the right one. On designing for systems that are capable but not
+                deterministic.
+              </p>
             </li>
           </ol>
         </div>
