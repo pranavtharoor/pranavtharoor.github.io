@@ -24,7 +24,10 @@
       property="og:description"
       content="Building generative AI systems on Apple's Artificial Intelligence &amp; Data Platforms team. Based in Bangalore."
     />
-    <meta property="og:image" content="https://pranavtharoor.com/img/og.jpg?v=1" />
+    <meta
+      property="og:image"
+      content="https://pranavtharoor.com/img/og.jpg?v=1"
+    />
     <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
@@ -35,7 +38,10 @@
       name="twitter:description"
       content="Building generative AI systems on Apple's Artificial Intelligence &amp; Data Platforms team. Based in Bangalore."
     />
-    <meta name="twitter:image" content="https://pranavtharoor.com/img/og.jpg?v=1" />
+    <meta
+      name="twitter:image"
+      content="https://pranavtharoor.com/img/og.jpg?v=1"
+    />
 
     <!-- Structured data, so search engines tie the name to the right person.
          Deliberately no email here — it is already a mailto link in the page,
@@ -141,12 +147,24 @@
         animation: grain 1.4s steps(7) infinite;
       }
       @keyframes grain {
-        0% { transform: translate(0, 0); }
-        20% { transform: translate(-40px, 30px); }
-        40% { transform: translate(30px, -50px); }
-        60% { transform: translate(-50px, -20px); }
-        80% { transform: translate(40px, 40px); }
-        100% { transform: translate(0, 0); }
+        0% {
+          transform: translate(0, 0);
+        }
+        20% {
+          transform: translate(-40px, 30px);
+        }
+        40% {
+          transform: translate(30px, -50px);
+        }
+        60% {
+          transform: translate(-50px, -20px);
+        }
+        80% {
+          transform: translate(40px, 40px);
+        }
+        100% {
+          transform: translate(0, 0);
+        }
       }
 
       /* ————— NAV ————— */
@@ -207,18 +225,26 @@
         -webkit-backdrop-filter: blur(16px) saturate(140%);
         -webkit-mask-image: linear-gradient(
           to bottom,
-          rgba(0, 0, 0, 1) 0, rgba(0, 0, 0, 1) 48px,
-          rgba(0, 0, 0, 0.727) 59px, rgba(0, 0, 0, 0.487) 71px,
-          rgba(0, 0, 0, 0.279) 85px, rgba(0, 0, 0, 0.128) 100px,
-          rgba(0, 0, 0, 0.042) 114px, rgba(0, 0, 0, 0.005) 129px,
+          rgba(0, 0, 0, 1) 0,
+          rgba(0, 0, 0, 1) 48px,
+          rgba(0, 0, 0, 0.727) 59px,
+          rgba(0, 0, 0, 0.487) 71px,
+          rgba(0, 0, 0, 0.279) 85px,
+          rgba(0, 0, 0, 0.128) 100px,
+          rgba(0, 0, 0, 0.042) 114px,
+          rgba(0, 0, 0, 0.005) 129px,
           rgba(0, 0, 0, 0) 140px
         );
         mask-image: linear-gradient(
           to bottom,
-          rgba(0, 0, 0, 1) 0, rgba(0, 0, 0, 1) 48px,
-          rgba(0, 0, 0, 0.727) 59px, rgba(0, 0, 0, 0.487) 71px,
-          rgba(0, 0, 0, 0.279) 85px, rgba(0, 0, 0, 0.128) 100px,
-          rgba(0, 0, 0, 0.042) 114px, rgba(0, 0, 0, 0.005) 129px,
+          rgba(0, 0, 0, 1) 0,
+          rgba(0, 0, 0, 1) 48px,
+          rgba(0, 0, 0, 0.727) 59px,
+          rgba(0, 0, 0, 0.487) 71px,
+          rgba(0, 0, 0, 0.279) 85px,
+          rgba(0, 0, 0, 0.128) 100px,
+          rgba(0, 0, 0, 0.042) 114px,
+          rgba(0, 0, 0, 0.005) 129px,
           rgba(0, 0, 0, 0) 140px
         );
       }
@@ -233,10 +259,14 @@
         height: 240px;
         background: linear-gradient(
           to bottom,
-          rgba(13, 13, 15, 0.35) 0, rgba(13, 13, 15, 0.35) 48px,
-          rgba(13, 13, 15, 0.254) 73px, rgba(13, 13, 15, 0.17) 101px,
-          rgba(13, 13, 15, 0.098) 133px, rgba(13, 13, 15, 0.045) 167px,
-          rgba(13, 13, 15, 0.015) 201px, rgba(13, 13, 15, 0.002) 224px,
+          rgba(13, 13, 15, 0.35) 0,
+          rgba(13, 13, 15, 0.35) 48px,
+          rgba(13, 13, 15, 0.254) 73px,
+          rgba(13, 13, 15, 0.17) 101px,
+          rgba(13, 13, 15, 0.098) 133px,
+          rgba(13, 13, 15, 0.045) 167px,
+          rgba(13, 13, 15, 0.015) 201px,
+          rgba(13, 13, 15, 0.002) 224px,
           rgba(13, 13, 15, 0) 240px
         );
       }
@@ -336,9 +366,18 @@
         content: "";
         position: absolute;
         inset: 0;
-        background:
-          radial-gradient(110% 90% at 50% 42%, transparent 42%, rgba(13, 13, 15, 0.6) 100%),
-          linear-gradient(to bottom, rgba(13, 13, 15, 0.72) 0%, transparent 32%, transparent 62%, var(--ink) 100%);
+        background: radial-gradient(
+            110% 90% at 50% 42%,
+            transparent 42%,
+            rgba(13, 13, 15, 0.6) 100%
+          ),
+          linear-gradient(
+            to bottom,
+            rgba(13, 13, 15, 0.72) 0%,
+            transparent 32%,
+            transparent 62%,
+            var(--ink) 100%
+          );
         pointer-events: none;
       }
 
@@ -415,10 +454,14 @@
       }
 
       @keyframes rise {
-        to { transform: translateY(0); }
+        to {
+          transform: translateY(0);
+        }
       }
       @keyframes fade-in {
-        to { opacity: 1; }
+        to {
+          opacity: 1;
+        }
       }
 
       /* ————— MARQUEE ————— */
@@ -459,7 +502,9 @@
         font-size: 0.8rem;
       }
       @keyframes marquee {
-        to { transform: translateX(-50%); }
+        to {
+          transform: translateX(-50%);
+        }
       }
 
       /* ————— SECTIONS ————— */
@@ -665,7 +710,11 @@
         opacity: clamp(0, calc(var(--p) * 18), 1);
         object-position: 50% calc(38% + (var(--p) * 34%));
         transform: scale(1.07)
-          translate3d(calc(var(--mx) * 2.6%), calc(-2vh + (var(--my) * 1.7%)), 0);
+          translate3d(
+            calc(var(--mx) * 2.6%),
+            calc(-2vh + (var(--my) * 1.7%)),
+            0
+          );
         filter: saturate(1.03) contrast(1.02);
       }
       /* A plate that 404s would leave a black hole, so fall back to the flat
@@ -682,9 +731,17 @@
         inset: 0;
         z-index: 2;
         pointer-events: none;
-        background:
-          radial-gradient(ellipse 75% 45% at 52% calc(93% - (var(--p) * 38%)), rgba(255, 232, 201, 0.13), transparent 66%),
-          linear-gradient(to bottom, rgba(4, 10, 15, 0.06), transparent 32%, rgba(3, 7, 7, 0.28));
+        background: radial-gradient(
+            ellipse 75% 45% at 52% calc(93% - (var(--p) * 38%)),
+            rgba(255, 232, 201, 0.13),
+            transparent 66%
+          ),
+          linear-gradient(
+            to bottom,
+            rgba(4, 10, 15, 0.06),
+            transparent 32%,
+            rgba(3, 7, 7, 0.28)
+          );
         mix-blend-mode: soft-light;
       }
       /* Held back at the start so the opening is pure photograph, and faded in
@@ -725,40 +782,20 @@
         inset: 0;
         z-index: 4;
         pointer-events: none;
-        background:
-          linear-gradient(
+        background: linear-gradient(
             to bottom,
             rgba(13, 13, 15, 1) 0%,
-            rgba(13, 13, 15, 0.857) 2.8%,
-            rgba(13, 13, 15, 0.727) 5.5%,
-            rgba(13, 13, 15, 0.609) 8.3%,
-            rgba(13, 13, 15, 0.487) 11.5%,
-            rgba(13, 13, 15, 0.381) 14.7%,
-            rgba(13, 13, 15, 0.279) 18.4%,
-            rgba(13, 13, 15, 0.195) 22.1%,
-            rgba(13, 13, 15, 0.128) 25.8%,
-            rgba(13, 13, 15, 0.078) 29.4%,
-            rgba(13, 13, 15, 0.042) 33.1%,
-            rgba(13, 13, 15, 0.018) 36.8%,
-            rgba(13, 13, 15, 0.005) 40.5%,
             rgba(13, 13, 15, 0) 46%
           ),
           linear-gradient(
             to top,
             rgba(13, 13, 15, 1) 0%,
-            rgba(13, 13, 15, 0.857) 2.4%,
-            rgba(13, 13, 15, 0.727) 4.8%,
-            rgba(13, 13, 15, 0.609) 7.2%,
-            rgba(13, 13, 15, 0.487) 10%,
-            rgba(13, 13, 15, 0.381) 12.8%,
-            rgba(13, 13, 15, 0.279) 16%,
-            rgba(13, 13, 15, 0.195) 19.2%,
-            rgba(13, 13, 15, 0.128) 22.4%,
-            rgba(13, 13, 15, 0.078) 25.6%,
-            rgba(13, 13, 15, 0.042) 28.8%,
-            rgba(13, 13, 15, 0.018) 32%,
-            rgba(13, 13, 15, 0.005) 35.2%,
             rgba(13, 13, 15, 0) 40%
+          ),
+          radial-gradient(
+            circle,
+            rgba(42, 123, 155, 0) 0%,
+            rgba(0, 0, 0, 1) 100%
           );
       }
       /* Pulled back over the pinned viewport so the type scrolls independently
@@ -1316,14 +1353,24 @@
       <div class="hero-video">
         <!-- poster carries the hero when autoplay is refused outright, as iOS
              Low Power Mode does regardless of how often we retry play() -->
-        <video autoplay muted loop playsinline webkit-playsinline preload="auto" poster="img/hero-poster.jpg">
+        <video
+          autoplay
+          muted
+          loop
+          playsinline
+          webkit-playsinline
+          preload="auto"
+          poster="img/hero-poster.jpg"
+        >
           <source src="img/IMG_1265.MP4" type="video/mp4" />
         </video>
       </div>
       <div class="hero-frame">
         <h1 class="hero-name">
           <span class="line"><span class="line-inner">Pranav</span></span>
-          <span class="line line--2"><span class="line-inner">Tharoor</span></span>
+          <span class="line line--2"
+            ><span class="line-inner">Tharoor</span></span
+          >
         </h1>
         <div class="hero-bottom">
           <p class="hero-role">
@@ -1434,7 +1481,9 @@
           <span class="job-idx mono">03</span>
           <div>
             <h3 class="job-role">Google Summer of Code</h3>
-            <span class="job-co mono">Canadian Centre for Computational Genomics</span>
+            <span class="job-co mono"
+              >Canadian Centre for Computational Genomics</span
+            >
           </div>
           <p class="job-desc">
             Developed an end-to-end open source web application for McGill
@@ -1509,9 +1558,27 @@
           <!-- environment, not content — the same role the hero video plays,
                so it is unlabelled and hidden from the accessibility tree -->
           <div class="wr-scene" aria-hidden="true">
-            <img class="wr-plate wr-original" src="img/otc-batur.jpg" alt="" loading="lazy" decoding="async" />
-            <img class="wr-plate wr-back" src="img/batur-backfill.webp" alt="" loading="lazy" decoding="async" />
-            <img class="wr-plate wr-fore" src="img/batur-foreground.webp" alt="" loading="lazy" decoding="async" />
+            <img
+              class="wr-plate wr-original"
+              src="img/otc-batur.jpg"
+              alt=""
+              loading="lazy"
+              decoding="async"
+            />
+            <img
+              class="wr-plate wr-back"
+              src="img/batur-backfill.webp"
+              alt=""
+              loading="lazy"
+              decoding="async"
+            />
+            <img
+              class="wr-plate wr-fore"
+              src="img/batur-foreground.webp"
+              alt=""
+              loading="lazy"
+              decoding="async"
+            />
             <div class="wr-atmos"></div>
             <div class="wr-scrim"></div>
             <div class="wr-veil"></div>
@@ -1541,8 +1608,8 @@
                 <h3 class="wr-title">Why Agents Need Fewer Tools</h3>
                 <p class="wr-blurb">
                   Every tool you add widens the space the model has to reason
-                  through. Notes on why the most reliable agents I've built
-                  were also the smallest.
+                  through. Notes on why the most reliable agents I've built were
+                  also the smallest.
                 </p>
               </div>
               <span class="wr-state mono">Draft</span>
@@ -1587,7 +1654,16 @@
         data-reveal
         style="--d: 0.1s"
       >
-        Let's <em>talk</em><span class="arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M6 18 18 6M8.5 6H18v9.5" /></svg></span>
+        Let's <em>talk</em
+        ><span class="arrow" aria-hidden="true"
+          ><svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.75"
+          >
+            <path d="M6 18 18 6M8.5 6H18v9.5" /></svg
+        ></span>
       </a>
       <p class="contact-note" data-reveal style="--d: 0.2s">
         I'm always open to interesting conversations, collaborations, or just a
@@ -1595,9 +1671,24 @@
       </p>
       <div class="contact-links" data-reveal style="--d: 0.25s">
         <a href="mailto:pranav.tharoor@gmail.com">Email</a>
-        <a href="https://in.linkedin.com/in/pranavtharoor" target="_blank" rel="noopener">LinkedIn</a>
-        <a href="https://github.com/pranavtharoor" target="_blank" rel="noopener">GitHub</a>
-        <a href="https://www.instagram.com/pranavtharoor" target="_blank" rel="noopener">Instagram</a>
+        <a
+          href="https://in.linkedin.com/in/pranavtharoor"
+          target="_blank"
+          rel="noopener"
+          >LinkedIn</a
+        >
+        <a
+          href="https://github.com/pranavtharoor"
+          target="_blank"
+          rel="noopener"
+          >GitHub</a
+        >
+        <a
+          href="https://www.instagram.com/pranavtharoor"
+          target="_blank"
+          rel="noopener"
+          >Instagram</a
+        >
       </div>
       <div class="foot-bar mono">
         <span>© 2026 Pranav Tharoor</span>
@@ -1752,7 +1843,10 @@
           var rect = stage.getBoundingClientRect();
           var travel = rect.height - window.innerHeight;
           var p = travel > 0 ? -rect.top / travel : 0;
-          stage.style.setProperty("--p", Math.min(1, Math.max(0, p)).toFixed(4));
+          stage.style.setProperty(
+            "--p",
+            Math.min(1, Math.max(0, p)).toFixed(4)
+          );
           ticking = false;
         }
         window.addEventListener(
@@ -1829,15 +1923,63 @@
       // `clip: true` means an .mp4 — muted, looping, played only while on
       // screen. Media is cropped to 3:4, so frame for a portrait crop.
       var OFF_THE_CLOCK = [
-        { src: "img/otc-skandagiri.mp4", place: "Skandagiri",  year: "2023", clip: true, alt: "Sunrise above the cloud line" },
-        { src: "img/otc-tennis.jpg",     place: "Bengaluru",   year: "2023", alt: "Mid-serve, airborne against the court screen" },
-        { src: "img/otc-thrissur.jpg",   place: "Thrissur",    year: "2026", alt: "Parasols and gold ornament at Pooram" },
-        { src: "img/otc-nusapenida.jpg", place: "Nusa Penida", year: "2024", alt: "Snorkelling over a reef" },
-        { src: "img/otc-coldplay.jpg",   place: "Navi Mumbai", year: "2025", alt: "Lit wristbands in a crowd" },
-        { src: "img/otc-jatayu.mp4",     place: "Jatayu",      year: "2025", clip: true, alt: "A giant stone eagle against an overcast sky" },
-        { src: "img/otc-halloween.jpg",  place: "Home",        year: "2022", alt: "A mask and a paper lantern" },
-        { src: "img/otc-maravanthe.jpg", place: "Maravanthe",  year: "2023", alt: "Black rock and a sunset over the sea" },
-        { src: "img/otc-edsheeran.mp4",  place: "Mumbai",      year: "2024", clip: true, alt: "A stage washed in violet" }
+        {
+          src: "img/otc-skandagiri.mp4",
+          place: "Skandagiri",
+          year: "2023",
+          clip: true,
+          alt: "Sunrise above the cloud line",
+        },
+        {
+          src: "img/otc-tennis.jpg",
+          place: "Bengaluru",
+          year: "2023",
+          alt: "Mid-serve, airborne against the court screen",
+        },
+        {
+          src: "img/otc-thrissur.jpg",
+          place: "Thrissur",
+          year: "2026",
+          alt: "Parasols and gold ornament at Pooram",
+        },
+        {
+          src: "img/otc-nusapenida.jpg",
+          place: "Nusa Penida",
+          year: "2024",
+          alt: "Snorkelling over a reef",
+        },
+        {
+          src: "img/otc-coldplay.jpg",
+          place: "Navi Mumbai",
+          year: "2025",
+          alt: "Lit wristbands in a crowd",
+        },
+        {
+          src: "img/otc-jatayu.mp4",
+          place: "Jatayu",
+          year: "2025",
+          clip: true,
+          alt: "A giant stone eagle against an overcast sky",
+        },
+        {
+          src: "img/otc-halloween.jpg",
+          place: "Home",
+          year: "2022",
+          alt: "A mask and a paper lantern",
+        },
+        {
+          src: "img/otc-maravanthe.jpg",
+          place: "Maravanthe",
+          year: "2023",
+          alt: "Black rock and a sunset over the sea",
+        },
+        {
+          src: "img/otc-edsheeran.mp4",
+          place: "Mumbai",
+          year: "2024",
+          clip: true,
+          alt: "A stage washed in violet",
+        },
       ];
 
       // Mount Batur belongs to whichever section is actually shipping. With
@@ -1847,8 +1989,10 @@
       // than dropping off the site altogether.
       if (!WRITING_ON) {
         OFF_THE_CLOCK.push({
-          src: "img/otc-batur.jpg", place: "Mount Batur", year: "2024",
-          alt: "A volcano through morning haze"
+          src: "img/otc-batur.jpg",
+          place: "Mount Batur",
+          year: "2024",
+          alt: "A volcano through morning haze",
         });
       }
 
@@ -1918,7 +2062,11 @@
           // Catch a cached failure that landed before the listener attached.
           // A lazy image still waiting to load reports complete === false, so
           // this only ever matches one that genuinely failed.
-          if (media.tagName === "IMG" && media.complete && !media.naturalWidth) {
+          if (
+            media.tagName === "IMG" &&
+            media.complete &&
+            !media.naturalWidth
+          ) {
             drop(item);
           }
         });
@@ -1926,7 +2074,8 @@
         var clips = section.querySelectorAll("video.otc-media");
         if (!clips.length || !("IntersectionObserver" in window)) return;
         // Under reduced motion the posters simply stay put — no playback.
-        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+          return;
 
         var onScreen = [];
         var io = new IntersectionObserver(
