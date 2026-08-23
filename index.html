@@ -161,27 +161,99 @@
         justify-content: space-between;
         padding: 0 5vw;
         height: 68px;
-        background: rgba(13, 13, 15, 0.35);
+      }
+      /* The glass lives on a pseudo-element, not on nav itself, for two
+         reasons: it has to reach past the bar to have anywhere to fade into,
+         and a mask on it fades the blur as well as the tint. Masking is the
+         whole trick — backdrop-filter is normally a hard-edged rectangle that
+         stops dead at the element bounds, but when the element carries a mask
+         the filtered backdrop is composited through it, so the blur can taper
+         off the same way the darkness does. Full strength through the links,
+         then out over the ~88px below them.
+
+         The falloff is the (1 - t)^2.5 shape used by the Writing veil, for the
+         same reason: a linear mask lands on zero with the slope still steep
+         and the eye finds the line, which is the hard edge we are removing.
+         Held opaque to 35% so the type keeps the full 0.35 tint it had before
+         — above that line this is pixel-identical to the old bar.
+
+         pointer-events matters here: the box extends 68px below the nav, and
+         without this it would swallow clicks on whatever sits under it. */
+      nav::before,
+      nav::after {
+        content: "";
+        position: absolute;
+        inset: 0 0 auto 0;
+        z-index: -1;
+        pointer-events: none;
+        transition: opacity 0.5s var(--ease);
+      }
+      /* The blur. Masking is the whole trick — backdrop-filter is normally a
+         hard-edged rectangle that stops dead at the element bounds, but when
+         the element carries a mask the filtered backdrop composites through
+         it, so the blur can taper instead of ending.
+
+         Deliberately the shorter of the two layers. A masked backdrop-filter
+         lays blurred content over sharp content, and through the middle of the
+         ramp — roughly alpha 0.3 to 0.7 — that reads as ghosting around type.
+         Keeping the blur short keeps that band to ~30px. Stretching this to
+         match the tint would triple it and the page would just look smudged.
+
+         Stops are in px, not percentages, so the opaque plateau stays welded
+         to the type at 48px no matter what height this box is given. */
+      nav::before {
+        height: 140px;
         backdrop-filter: blur(16px) saturate(140%);
         -webkit-backdrop-filter: blur(16px) saturate(140%);
-        transition: background-color 0.5s var(--ease), backdrop-filter 0.5s var(--ease);
+        -webkit-mask-image: linear-gradient(
+          to bottom,
+          rgba(0, 0, 0, 1) 0, rgba(0, 0, 0, 1) 48px,
+          rgba(0, 0, 0, 0.727) 59px, rgba(0, 0, 0, 0.487) 71px,
+          rgba(0, 0, 0, 0.279) 85px, rgba(0, 0, 0, 0.128) 100px,
+          rgba(0, 0, 0, 0.042) 114px, rgba(0, 0, 0, 0.005) 129px,
+          rgba(0, 0, 0, 0) 140px
+        );
+        mask-image: linear-gradient(
+          to bottom,
+          rgba(0, 0, 0, 1) 0, rgba(0, 0, 0, 1) 48px,
+          rgba(0, 0, 0, 0.727) 59px, rgba(0, 0, 0, 0.487) 71px,
+          rgba(0, 0, 0, 0.279) 85px, rgba(0, 0, 0, 0.128) 100px,
+          rgba(0, 0, 0, 0.042) 114px, rgba(0, 0, 0, 0.005) 129px,
+          rgba(0, 0, 0, 0) 140px
+        );
       }
-      /* One state, driven by whether the masthead is still on screen — the bar
-         and the small name arrive together as it passes behind.
-         Keep them on the same trigger. Hanging the bar off the hero instead
+      /* The darkness, running nearly twice as far. This one is only a
+         gradient — no filter — so its length costs nothing to composite, which
+         is what lets the tint blend out over 240px while the blur above stays
+         cheap and tight. Same (1 - t)^2.5 falloff as the Writing veil: a
+         linear ramp lands on zero with the slope still steep and the eye finds
+         the line, which is the edge being removed in the first place.
+         Paints after ::before, so it darkens the blurred result. */
+      nav::after {
+        height: 240px;
+        background: linear-gradient(
+          to bottom,
+          rgba(13, 13, 15, 0.35) 0, rgba(13, 13, 15, 0.35) 48px,
+          rgba(13, 13, 15, 0.254) 73px, rgba(13, 13, 15, 0.17) 101px,
+          rgba(13, 13, 15, 0.098) 133px, rgba(13, 13, 15, 0.045) 167px,
+          rgba(13, 13, 15, 0.015) 201px, rgba(13, 13, 15, 0.002) 224px,
+          rgba(13, 13, 15, 0) 240px
+        );
+      }
+      /* One state, driven by whether the masthead is still on screen — the
+         glass and the small name arrive together as it passes behind.
+         Keep them on the same trigger. Hanging the glass off the hero instead
          left a stretch where the masthead had gone, the small name was in, and
          the hero's own role line scrolled under a nav with nothing behind it.
-         The bar is only dropped in the first place because the video carries
-         its own top gradient — 0.72 ink at the top, out by 32%, so still 0.56
-         at the bar's 68px, ample ground for the links. Laying the bar's 0.35
-         over that took it to 0.71, making the image 35% dimmer above the line
-         than below and putting a hard horizontal edge across the frame. Unlike
-         the veil gradients that edge cannot be feathered: backdrop-filter
-         stops dead where the element stops. */
-      .nav--masthead {
-        background: transparent;
-        backdrop-filter: none;
-        -webkit-backdrop-filter: none;
+         The glass is dropped over the hero at all because the video already
+         carries its own top gradient — 0.72 ink at the top, out by 32%, so
+         still 0.56 at the bar's 68px, ample ground for the links. Laying
+         another 0.35 over that made the image 35% dimmer above the line than
+         below. Fading the layer's opacity rather than animating
+         backdrop-filter, which is expensive to interpolate and janky. */
+      .nav--masthead::before,
+      .nav--masthead::after {
+        opacity: 0;
       }
       .nav-name {
         font-family: var(--serif);
@@ -931,7 +1003,8 @@
           transition: none;
         }
         /* both still hand over, just without the crossfade */
-        nav,
+        nav::before,
+        nav::after,
         .nav-name {
           transition: none;
         }
