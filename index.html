@@ -4,6 +4,21 @@
      themselves and Mount Batur moves back into Off the Clock when it is off. -->
 <html lang="en" data-writing="off">
   <head>
+    <!-- Stamps data-theme before the <style> below ever paints, so a stored
+         preference that disagrees with the system (dark system, saved
+         light choice) never flashes the wrong theme first. Blocking and
+         inline on purpose — anything deferred runs after first paint. -->
+    <script>
+      (function () {
+        var stored = null;
+        try {
+          stored = localStorage.getItem("theme");
+        } catch (e) {}
+        if (stored === "light" || stored === "dark") {
+          document.documentElement.dataset.theme = stored;
+        }
+      })();
+    </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pranav Tharoor</title>
@@ -90,6 +105,21 @@
         padding: 0;
       }
 
+      /* ————— THEME —————
+         --ink/--bone/--muted/--gold/--line are page chrome: they flip
+         between the dark and light blocks below. The hero video and the
+         Writing section's pinned photograph are graded footage, not
+         chrome — same reason the print sheet forces gold to near-black
+         rather than trying to make champagne work on paper. Text sitting
+         on that footage (the hero masthead, Writing's title/index, nav)
+         still flips with the theme same as everywhere else; what stays
+         put instead is the footage's own overlay gradients — see
+         .hero-video::after, .wr-veil and nav::after, each with a light-
+         theme override that washes toward white instead of black once
+         the text sitting on them needs to go dark to match. --ink-fixed
+         is the one token that stays put on purpose: ::selection's text
+         colour, which sits on a gold highlight in both themes and has no
+         reason to flip with it. */
       :root {
         --ink: #0d0d0f;
         --ink-soft: #131315;
@@ -97,10 +127,41 @@
         --muted: #8f8c85;
         --gold: #c2a87c;
         --line: rgba(234, 231, 225, 0.12);
+
+        --ink-fixed: #0d0d0f;
+
         --serif: "Fraunces", Georgia, serif;
         --sans: "Hanken Grotesk", -apple-system, sans-serif;
         --mono: "IBM Plex Mono", monospace;
         --ease: cubic-bezier(0.19, 1, 0.22, 1);
+      }
+      /* System default: only applies while nothing has been chosen by hand
+         (the [data-theme] blocks below both outrank this on specificity). */
+      @media (prefers-color-scheme: light) {
+        :root {
+          --ink: #f7f4ee;
+          --ink-soft: #efebe2;
+          --bone: #1b1916;
+          --muted: #66605a;
+          --gold: #8a6b35;
+          --line: rgba(20, 18, 14, 0.12);
+        }
+      }
+      :root[data-theme="dark"] {
+        --ink: #0d0d0f;
+        --ink-soft: #131315;
+        --bone: #eae7e1;
+        --muted: #8f8c85;
+        --gold: #c2a87c;
+        --line: rgba(234, 231, 225, 0.12);
+      }
+      :root[data-theme="light"] {
+        --ink: #f7f4ee;
+        --ink-soft: #efebe2;
+        --bone: #1b1916;
+        --muted: #66605a;
+        --gold: #8a6b35;
+        --line: rgba(20, 18, 14, 0.12);
       }
 
       html {
@@ -119,7 +180,7 @@
 
       ::selection {
         background: var(--gold);
-        color: var(--ink);
+        color: var(--ink-fixed);
       }
 
       em {
@@ -270,6 +331,40 @@
           rgba(13, 13, 15, 0) 240px
         );
       }
+      /* Light theme: the glass lightens instead of darkens — nav text is
+         dark now (see .nav-name), so it needs a light patch to sit on, same
+         swap as the Writing scrim. Same falloff shape, recoloured via
+         color-mix so each stop tracks whichever --ink is current. */
+      :root[data-theme="light"] nav::after {
+        background: linear-gradient(
+          to bottom,
+          color-mix(in srgb, var(--ink) 35%, transparent) 0,
+          color-mix(in srgb, var(--ink) 35%, transparent) 48px,
+          color-mix(in srgb, var(--ink) 25.4%, transparent) 73px,
+          color-mix(in srgb, var(--ink) 17%, transparent) 101px,
+          color-mix(in srgb, var(--ink) 9.8%, transparent) 133px,
+          color-mix(in srgb, var(--ink) 4.5%, transparent) 167px,
+          color-mix(in srgb, var(--ink) 1.5%, transparent) 201px,
+          color-mix(in srgb, var(--ink) 0.2%, transparent) 224px,
+          transparent 240px
+        );
+      }
+      @media (prefers-color-scheme: light) {
+        :root:not([data-theme="dark"]) nav::after {
+          background: linear-gradient(
+            to bottom,
+            color-mix(in srgb, var(--ink) 35%, transparent) 0,
+            color-mix(in srgb, var(--ink) 35%, transparent) 48px,
+            color-mix(in srgb, var(--ink) 25.4%, transparent) 73px,
+            color-mix(in srgb, var(--ink) 17%, transparent) 101px,
+            color-mix(in srgb, var(--ink) 9.8%, transparent) 133px,
+            color-mix(in srgb, var(--ink) 4.5%, transparent) 167px,
+            color-mix(in srgb, var(--ink) 1.5%, transparent) 201px,
+            color-mix(in srgb, var(--ink) 0.2%, transparent) 224px,
+            transparent 240px
+          );
+        }
+      }
       /* One state, driven by whether the masthead is still on screen — the
          glass and the small name arrive together as it passes behind.
          Keep them on the same trigger. Hanging the glass off the hero instead
@@ -290,6 +385,9 @@
         font-weight: 380;
         font-size: 1.05rem;
         letter-spacing: 0.01em;
+        /* Flipping, not *-fixed: nav::after's glass lightens instead of
+           darkening in light theme (see below), so dark text is what
+           actually reads against it now. */
         color: var(--bone);
         text-decoration: none;
         transition: opacity 0.5s var(--ease), visibility 0.5s var(--ease);
@@ -302,6 +400,14 @@
       .nav--masthead .nav-name {
         opacity: 0;
         visibility: hidden;
+      }
+      /* Groups the links and the theme toggle so nav keeps exactly two
+         flex children — adding the toggle as a third would pull it to
+         the bar's dead center instead of the right edge. */
+      .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 1.75rem;
       }
       .nav-links {
         display: flex;
@@ -317,6 +423,71 @@
       }
       .nav-links a:hover {
         color: var(--bone);
+      }
+      /* --muted reads fine at rest on dark, but on light it's a warm mid-
+         grey that's too close to the (also light) glass behind it. Darker,
+         fixed value rather than tuning --muted itself — that token is
+         shared with job/contact copy elsewhere that isn't sitting on nav's
+         glass and doesn't have the same contrast problem. */
+      :root[data-theme="light"] .nav-links a {
+        color: #3d3a35;
+      }
+      @media (prefers-color-scheme: light) {
+        :root:not([data-theme="dark"]) .nav-links a {
+          color: #3d3a35;
+        }
+      }
+      /* Theme toggle — plain icon button, same restrained language as the
+         nav links: no fill, no border, a hover tint and nothing else. */
+      .theme-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: none;
+        border: none;
+        padding: 0.4rem;
+        margin: -0.4rem;
+        color: var(--muted);
+        cursor: pointer;
+        transition: color 0.2s ease;
+      }
+      .theme-toggle:hover {
+        color: var(--gold);
+      }
+      :root[data-theme="light"] .theme-toggle {
+        color: #3d3a35;
+      }
+      @media (prefers-color-scheme: light) {
+        :root:not([data-theme="dark"]) .theme-toggle {
+          color: #3d3a35;
+        }
+      }
+      .theme-toggle svg {
+        width: 15px;
+        height: 15px;
+        display: block;
+      }
+      /* Icon shown = theme a click switches to. The inline script in <head>
+         always resolves and stamps data-theme before first paint (including
+         mirroring system preference when nothing has been chosen by hand),
+         so these two rules are the only ones that matter with JS on. The
+         media query is strictly a no-JS fallback. */
+      .theme-toggle [data-icon-moon] {
+        display: none;
+      }
+      :root[data-theme="light"] .theme-toggle [data-icon-sun] {
+        display: none;
+      }
+      :root[data-theme="light"] .theme-toggle [data-icon-moon] {
+        display: block;
+      }
+      @media (prefers-color-scheme: light) {
+        :root:not([data-theme]) .theme-toggle [data-icon-sun] {
+          display: none;
+        }
+        :root:not([data-theme]) .theme-toggle [data-icon-moon] {
+          display: block;
+        }
       }
 
       /* ————— HERO ————— */
@@ -366,6 +537,11 @@
         content: "";
         position: absolute;
         inset: 0;
+        /* Corner vignette and the top scrim (nav legibility) stay literal,
+           fixed-dark — mood grading on the footage itself. Only the bottom
+           stop is a page-boundary handoff, so it alone follows the theme:
+           the video now resolves into whichever colour the section below
+           it actually is. */
         background: radial-gradient(
             110% 90% at 50% 42%,
             transparent 42%,
@@ -375,10 +551,56 @@
             to bottom,
             rgba(13, 13, 15, 0.72) 0%,
             transparent 32%,
-            transparent 62%,
+            /* color-mix, not the bare "transparent" keyword: fading a
+               variable color straight to transparent interpolates through
+               transparent BLACK, which is invisible against dark --ink but
+               shows as a muddy grey dip once --ink is a light cream. */
+              color-mix(in srgb, var(--ink) 0%, transparent) 62%,
             var(--ink) 100%
           );
         pointer-events: none;
+      }
+      /* Light theme: the video washes toward white rather than black, since
+         the masthead sitting on it is dark text now (see .hero-name). Kept
+         as a full override rather than re-tokenizing the rule above —
+         the stop positions themselves change, not just the colour, so a
+         var() swap alone can't do this. A sliver of the original dark top
+         scrim survives (0-6%) purely so the permanently-dark nav glass
+         still has *something* dark immediately behind it. Past that the
+         video is left alone until 48% — a much wider untouched band than
+         earlier passes at this, so most of the frame stays visible footage
+         — then washes to white by 96%, near the very bottom edge, so it
+         still resolves cleanly into the section below. Radial corner
+         vignette pushed out to match (38% vs. the earlier 20%). */
+      :root[data-theme="light"] .hero-video::after {
+        background: radial-gradient(
+            110% 90% at 50% 42%,
+            transparent 38%,
+            var(--ink) 100%
+          ),
+          linear-gradient(
+            to bottom,
+            rgba(13, 13, 15, 0.5) 0%,
+            transparent 6%,
+            color-mix(in srgb, var(--ink) 0%, transparent) 48%,
+            var(--ink) 96%
+          );
+      }
+      @media (prefers-color-scheme: light) {
+        :root:not([data-theme="dark"]) .hero-video::after {
+          background: radial-gradient(
+              110% 90% at 50% 42%,
+              transparent 38%,
+              var(--ink) 100%
+            ),
+            linear-gradient(
+              to bottom,
+              rgba(13, 13, 15, 0.5) 0%,
+              transparent 6%,
+              color-mix(in srgb, var(--ink) 0%, transparent) 48%,
+              var(--ink) 96%
+            );
+        }
       }
 
       .hero-frame {
@@ -407,6 +629,9 @@
         font-size: clamp(4.2rem, 13.5vw, 13.5rem);
         line-height: 0.94;
         letter-spacing: -0.01em;
+        /* Flipping, not *-fixed: light theme washes the lower half of the
+           video toward white (see .hero-video::after), so the masthead
+           needs to go dark there rather than staying bone regardless. */
         color: var(--bone);
       }
       .hero-name .line {
@@ -447,9 +672,10 @@
         color: var(--gold);
       }
       /* The fourth corner. Dimmer than the role beside it so the pair reads as
-         statement and marginal note rather than two equal lines. */
+         statement and marginal note rather than two equal lines. color-mix,
+         not a literal bone rgba, so this dims whichever bone is current. */
       .hero-where {
-        color: rgba(234, 231, 225, 0.72);
+        color: color-mix(in srgb, var(--bone) 72%, transparent);
         white-space: nowrap;
       }
 
@@ -603,16 +829,18 @@
         justify-self: end;
       }
 
-      /* ————— CAPABILITIES ————— */
-      #skills {
-        padding-top: clamp(4rem, 9vh, 7rem);
-      }
+      /* ————— CAPABILITIES —————
+         No longer its own section — folded into Experience, one skills
+         grid under the job list rather than a second heading.
+         Deliberately no border-top: the last .job already closes the list
+         with its own border-bottom, so a rule here would be a second
+         hairline with nothing but whitespace between the two. The gap
+         below plus the gold labels are the separation. */
       .caps {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
         gap: 2.5rem;
-        border-top: 1px solid var(--line);
-        padding-top: 3rem;
+        margin-top: clamp(4.5rem, 10vh, 7.5rem);
       }
       .cap h4 {
         font-family: var(--mono);
@@ -656,6 +884,13 @@
          the horizontal padding belongs on .wr-content instead. */
       #writing {
         padding: 0;
+      }
+      /* #writing-top is the anchor target (see the header markup below) —
+         native anchor scrolling puts its top flush with the viewport top,
+         which tucks it straight under the fixed 68px nav. Clear the bar
+         plus a little breathing room. */
+      #writing-top {
+        scroll-margin-top: 100px;
       }
       .wr-stage {
         position: relative;
@@ -758,6 +993,25 @@
         );
         opacity: clamp(0, calc((var(--p) - 0.06) * 5), 1);
       }
+      /* Light theme: the card list's text is dark now (see .wr-title), so
+         the scrim has to lighten the photo behind it for contrast instead
+         of darkening it — same job, opposite direction. */
+      :root[data-theme="light"] .wr-scrim {
+        background: linear-gradient(
+          to bottom,
+          color-mix(in srgb, var(--ink) 34%, transparent),
+          color-mix(in srgb, var(--ink) 58%, transparent)
+        );
+      }
+      @media (prefers-color-scheme: light) {
+        :root:not([data-theme="dark"]) .wr-scrim {
+          background: linear-gradient(
+            to bottom,
+            color-mix(in srgb, var(--ink) 34%, transparent),
+            color-mix(in srgb, var(--ink) 58%, transparent)
+          );
+        }
+      }
       /* Long eased ramps top and bottom, so the photograph resolves out of the
          page instead of butting against it.
 
@@ -782,21 +1036,70 @@
         inset: 0;
         z-index: 4;
         pointer-events: none;
+        /* Corner vignette stays literal, fixed-dark in this (dark-theme)
+           version — mood grading on the photo itself. The top/bottom ramps
+           are the page-boundary handoff the comment above describes, so
+           those follow the theme; each fades to color-mix rather than the
+           bare "transparent" keyword; see the matching note on
+           .hero-video::after for why. Light theme overrides the whole
+           thing below, corner vignette included this time. */
         background: linear-gradient(
             to bottom,
-            rgba(13, 13, 15, 1) 0%,
-            rgba(13, 13, 15, 0) 46%
+            var(--ink) 0%,
+            color-mix(in srgb, var(--ink) 0%, transparent) 46%
           ),
           linear-gradient(
             to top,
-            rgba(13, 13, 15, 1) 0%,
-            rgba(13, 13, 15, 0) 40%
+            var(--ink) 0%,
+            color-mix(in srgb, var(--ink) 0%, transparent) 40%
           ),
           radial-gradient(
             circle,
             rgba(42, 123, 155, 0) 0%,
             rgba(0, 0, 0, 1) 100%
           );
+      }
+      /* Light theme: everything above resolves to white instead of black —
+         the card list's title/index text is dark now (see .wr-title /
+         .wr-idx), so a dark vignette would fight it instead of framing it.
+         Pushed much earlier than the dark version's 46%/40% (58%/42%, only
+         2% apart) so white dominates most of the frame rather than just the
+         edges, and the corner vignette — left dark above — goes white too. */
+      :root[data-theme="light"] .wr-veil {
+        background: linear-gradient(
+            to bottom,
+            var(--ink) 0%,
+            color-mix(in srgb, var(--ink) 0%, transparent) 58%
+          ),
+          linear-gradient(
+            to top,
+            var(--ink) 0%,
+            color-mix(in srgb, var(--ink) 0%, transparent) 42%
+          ),
+          radial-gradient(
+            circle,
+            color-mix(in srgb, var(--ink) 0%, transparent) 30%,
+            var(--ink) 100%
+          );
+      }
+      @media (prefers-color-scheme: light) {
+        :root:not([data-theme="dark"]) .wr-veil {
+          background: linear-gradient(
+              to bottom,
+              var(--ink) 0%,
+              color-mix(in srgb, var(--ink) 0%, transparent) 58%
+            ),
+            linear-gradient(
+              to top,
+              var(--ink) 0%,
+              color-mix(in srgb, var(--ink) 0%, transparent) 42%
+            ),
+            radial-gradient(
+              circle,
+              color-mix(in srgb, var(--ink) 0%, transparent) 30%,
+              var(--ink) 100%
+            );
+        }
       }
       /* Pulled back over the pinned viewport so the type scrolls independently
          of the picture. Deliberately not display:flex — the articles are block
@@ -837,6 +1140,13 @@
         scroll-snap-align: start;
         padding: 0;
       }
+      /* Only the first card is built yet, so only it gets a link — an
+         unbuilt draft has nowhere to point. */
+      .wr-link {
+        display: block;
+        color: inherit;
+        text-decoration: none;
+      }
       .wr-media {
         display: block;
         width: 100%;
@@ -861,8 +1171,12 @@
         opacity: 0.85;
       }
       .wr-type {
-        color: rgba(234, 231, 225, 0.5);
+        color: color-mix(in srgb, var(--bone) 50%, transparent);
       }
+      /* No explicit color here — inherits body text color, which now
+         flips correctly: light theme washes this section's own backdrop
+         toward white (see .wr-veil/.wr-scrim), so dark text is the
+         readable choice there, same as everywhere else on the page. */
       .wr-title {
         margin-top: 0.65rem;
         font-family: var(--serif);
@@ -873,13 +1187,13 @@
       }
       .wr-blurb {
         margin-top: 0.7rem;
-        color: rgba(234, 231, 225, 0.66);
+        color: color-mix(in srgb, var(--bone) 66%, transparent);
         font-size: 0.95rem;
         line-height: 1.7;
         max-width: 48ch;
       }
       .wr-state {
-        color: rgba(234, 231, 225, 0.5);
+        color: color-mix(in srgb, var(--bone) 50%, transparent);
       }
 
       /* ————— OFF THE CLOCK ————— */
@@ -1192,8 +1506,7 @@
           transition: none !important;
         }
         section,
-        #experience,
-        #skills {
+        #experience {
           padding: 0 0 7mm !important;
         }
         /* Masthead becomes a CV letterhead */
@@ -1296,10 +1609,11 @@
           max-width: none !important;
           font-size: 9.5pt !important;
         }
+        /* No border-top here either — same double-hairline as on screen,
+           since the last .job already rules off above it. */
         .caps {
           grid-template-columns: repeat(4, 1fr) !important;
-          border-top: 1px solid #ccc !important;
-          padding-top: 4mm !important;
+          margin-top: 6mm !important;
           gap: 5mm !important;
           page-break-inside: avoid;
         }
@@ -1348,13 +1662,44 @@
          than by the script so the name cannot flash before the first paint -->
     <nav class="nav--masthead">
       <a class="nav-name" href="#hero">Pranav Tharoor</a>
-      <ul class="nav-links">
-        <li><a href="#experience">Experience</a></li>
-        <li><a href="#skills">Capabilities</a></li>
-        <li class="nav-writing"><a href="#writing">Writing</a></li>
-        <li><a href="#offtheclock">Off the Clock</a></li>
-        <li><a href="#contact">Contact</a></li>
-      </ul>
+      <div class="nav-right">
+        <ul class="nav-links">
+          <li><a href="#experience">Experience</a></li>
+          <li class="nav-writing"><a href="#writing-top">Writing</a></li>
+          <li><a href="#offtheclock">Off the Clock</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+        <button
+          type="button"
+          class="theme-toggle"
+          data-theme-toggle
+          aria-label="Switch to light theme"
+        >
+          <svg
+            data-icon-sun
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.6"
+          >
+            <circle cx="12" cy="12" r="4.2" />
+            <path
+              d="M12 2.5v2.4M12 19.1v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7"
+            />
+          </svg>
+          <svg
+            data-icon-moon
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.6"
+          >
+            <path
+              d="M20 14.2A8.5 8.5 0 1 1 9.8 4a6.6 6.6 0 0 0 10.2 10.2Z"
+            />
+          </svg>
+        </button>
+      </div>
     </nav>
 
     <!-- HERO -->
@@ -1391,8 +1736,8 @@
       </div>
     </header>
 
-    <!-- MARQUEE -->
-    <div class="marquee" aria-hidden="true">
+    <!-- MARQUEE — hidden for now; remove `hidden` to bring it back. -->
+    <div class="marquee" aria-hidden="true" hidden>
       <div class="marquee-track">
         <div class="marquee-set">
           <span class="mq-sans">Generative AI</span>
@@ -1436,9 +1781,10 @@
     <!-- ABOUT -->
     <section id="about">
       <p class="statement-lead" data-reveal>
-        Full-stack engineer working on <em>generative AI</em> — before Apple,
-        two years at Cloudera building cloud microservices, and a start in open
-        source through Google Summer of Code at McGill University.
+        Full-stack engineer working on <em>generative AI</em>. Before Apple, I
+        spent two years at Cloudera building cloud microservices, and got my
+        start in open source through Google Summer of Code 2019 at McGill
+        University.
       </p>
       <div class="statement-body" data-reveal style="--d: 0.15s">
         <p>
@@ -1514,14 +1860,9 @@
           <span class="job-date mono">May 2018 → Jun 2018</span>
         </li>
       </ol>
-    </section>
 
-    <!-- CAPABILITIES -->
-    <section id="skills">
-      <div class="sec-head" data-reveal>
-        <h2 class="sec-title">Capabilities</h2>
-        <span class="sec-idx mono">( 02 )</span>
-      </div>
+      <!-- Capabilities used to be its own section; folded in here as a
+           skills grid under the job list rather than a second heading. -->
       <div class="caps">
         <div class="cap" data-reveal>
           <h4>AI &amp; Data</h4>
@@ -1594,7 +1935,10 @@
           </div>
         </div>
         <div class="wr-content">
-          <div class="sec-head" data-reveal>
+          <!-- #writing anchors here, not on the section: the section's own
+               top is the pinned mountain, scrolled 90vh above where the
+               header+list actually render. -->
+          <div class="sec-head" id="writing-top" data-reveal>
             <h2 class="sec-title">Writing</h2>
             <span class="sec-idx mono">( 03 )</span>
           </div>
@@ -1606,23 +1950,25 @@
                vertical scroll. -->
           <ol class="wr-list" data-reveal>
             <li class="wr-item">
-              <img
-                class="wr-media"
-                src="https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=1200&q=82"
-                alt=""
-                loading="lazy"
-                decoding="async"
-              />
-              <div class="wr-meta">
-                <span class="wr-idx mono">01</span>
-                <span class="wr-type mono">ESSAY · DRAFT</span>
-              </div>
-              <h3 class="wr-title">The AI Agent Protocol Stack</h3>
-              <p class="wr-blurb">
-                MCP, function calling, and the half-dozen competing conventions
-                underneath them — and what an interoperability layer for agents
-                would actually have to guarantee.
-              </p>
+              <a class="wr-link" href="writing/protocol-stack.html">
+                <img
+                  class="wr-media"
+                  src="https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=1200&q=82"
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div class="wr-meta">
+                  <span class="wr-idx mono">01</span>
+                  <span class="wr-type mono">ESSAY</span>
+                </div>
+                <h3 class="wr-title">The AI Agent Protocol Stack</h3>
+                <p class="wr-blurb">
+                  MCP, ACP, AHP &amp; A2A — understanding the emerging
+                  architecture of AI agents, as an interactive documentary or a
+                  conventional essay.
+                </p>
+              </a>
             </li>
             <li class="wr-item">
               <img
@@ -2179,6 +2525,42 @@
           el.addEventListener("click", function () {
             window.location.href = "/surface/";
           });
+        });
+      })();
+
+      // ————— THEME TOGGLE —————
+      // The blocking script in <head> already stamped data-theme if a
+      // choice was stored; this just wires the button and keeps it honest
+      // about which theme is actually showing.
+      (function () {
+        var btn = document.querySelector("[data-theme-toggle]");
+        if (!btn) return;
+        var media = window.matchMedia("(prefers-color-scheme: light)");
+
+        function effective() {
+          var stored = document.documentElement.dataset.theme;
+          if (stored === "light" || stored === "dark") return stored;
+          return media.matches ? "light" : "dark";
+        }
+        function setLabel() {
+          var next = effective() === "light" ? "dark" : "light";
+          btn.setAttribute("aria-label", "Switch to " + next + " theme");
+        }
+        setLabel();
+
+        btn.addEventListener("click", function () {
+          var next = effective() === "light" ? "dark" : "light";
+          document.documentElement.dataset.theme = next;
+          try {
+            localStorage.setItem("theme", next);
+          } catch (e) {}
+          setLabel();
+        });
+
+        // No explicit choice yet: keep following the system live, same as
+        // the no-JS media-query fallback does.
+        media.addEventListener("change", function () {
+          if (!document.documentElement.dataset.theme) setLabel();
         });
       })();
     </script>
