@@ -1,10 +1,38 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <defs>
-    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#7c6af7"/>
-      <stop offset="100%" stop-color="#5ee7df"/>
-    </linearGradient>
-  </defs>
-  <rect width="32" height="32" rx="6" fill="#0a0a0f"/>
-  <text x="16" y="22" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-weight="700" font-size="16" fill="url(#g)">PT</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Pranav Tharoor">
+  <!-- Serif P on the site's ink ground, mirroring the hero masthead:
+       bone type on near-black, no rounded corners, no gradient.
+
+       The letterform is drawn as a path rather than set in Fraunces for
+       two reasons: SVG favicons do not load webfonts, so a font-family
+       would silently fall back to whatever the OS has; and Fraunces is a
+       high-contrast display face whose thin strokes disappear entirely at
+       16px. This is the same skeleton with the contrast pulled in — the
+       bowl's thin strokes are 2.35 units against a 3.1 thick and a 3.7
+       stem, with 2.2-unit serifs — so the shape survives a favicon slot
+       instead of turning to mush. Numbers are in the 32-unit viewBox, so
+       halve them for the 16px case: the thinnest stroke is still ~1.2px.
+       Anything more elegant than this disappears. -->
+  <rect width="32" height="32" fill="#0d0d0f"/>
+  <path fill="#eae7e1" fill-rule="evenodd" d="
+    M 9.4 7
+    L 17.6 7
+    C 20.64 7 23.1 9.19 23.1 11.9
+    C 23.1 14.61 20.64 16.8 17.6 16.8
+    L 16.1 16.8
+    L 16.1 22.8
+    L 19.3 22.8
+    L 19.3 25
+    L 9.2 25
+    L 9.2 22.8
+    L 12.4 22.8
+    L 12.4 9.2
+    L 9.4 9.2
+    Z
+    M 16.1 9.35
+    L 17.3 9.35
+    C 18.79 9.35 20 10.49 20 11.9
+    C 20 13.31 18.79 14.45 17.3 14.45
+    L 16.1 14.45
+    Z
+  "/>
 </svg>
