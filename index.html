@@ -228,6 +228,93 @@
         }
       }
 
+      /* ————— BIRD —————
+         z-index 90 sits above .hero-frame (2) and every section, below nav
+         (100) and the grain (300) — so it passes behind the nav glass and
+         gets dithered by the grain like everything else on the page.
+
+         --bone rather than --muted: bone is the body text colour, so every
+         scrim on this page (.hero-video::after, .wr-scrim, .wr-veil) already
+         exists to keep it legible over the footage in both themes, and the
+         bird inherits all of that for free. --muted is the token that failed
+         exactly this test once already — see the hardcoded override on
+         .nav-links a. */
+      .bird {
+        position: fixed;
+        left: 0;
+        top: var(--y, 0px);
+        z-index: 90;
+        width: var(--w, 20px);
+        height: var(--w, 20px);
+        pointer-events: none;
+        color: var(--bone);
+        opacity: 0;
+        /* -100% is the element's own width, so it rests exactly off-screen —
+           no vw overshoot to reason about against body's overflow-x: hidden. */
+        transform: translate3d(-100%, 0, 0);
+      }
+      .bird.is-flying {
+        opacity: 0.26;
+        animation: fly var(--t) linear var(--delay, 0s) var(--dir, normal)
+          forwards;
+      }
+      /* linear, and a single `to` stop. animation-timing-function applies per
+         keyframe interval, so the default ease across stops at 0/50/100 would
+         decelerate the bird to a near-stop mid-screen and accelerate it out
+         again. A distant bird holds its speed; holding it also means the
+         drift can be monotonic, so there is no midpoint to declare. */
+      @keyframes fly {
+        to {
+          transform: translate3d(100vw, var(--rise, 0px), 0);
+        }
+      }
+      /* The flap is a vertical mirror of the same path: scaleY(1) is wings up,
+         scaleY(-1) is wings down, and the pass through zero is the
+         wings-level frame we would otherwise have to draw. transform-box:
+         view-box puts the origin on the body at 12,12, so the wings move and
+         the body holds still.
+
+         Three beats then a glide — a gull cruises far more than it flaps, and
+         a mark that flaps without pause for twenty seconds is the one thing
+         most likely to read as a sprite. The short downstroke against the
+         longer recovery is most of what sells it. Scoped to .is-flying so
+         there is no infinite animation parked on an idle element. */
+      .bird.is-flying path {
+        transform-box: view-box;
+        /* Both of these are load-bearing. SVG child elements default to
+           transform-origin: 0 0, not 50% 50% like HTML — without this the
+           scaleY(-1) downstroke mirrors the path clean out of the top of the
+           viewBox, where it is clipped, and the bird vanishes on every
+           wingbeat. With view-box, 50% 50% is the body at (12,12). */
+        transform-origin: 50% 50%;
+        animation: flap var(--fw, 2.4s) ease-in-out infinite;
+      }
+      @keyframes flap {
+        0%,
+        8% {
+          transform: scaleY(0.35);
+        }
+        15% {
+          transform: scaleY(-1);
+        }
+        26% {
+          transform: scaleY(1);
+        }
+        33% {
+          transform: scaleY(-1);
+        }
+        44% {
+          transform: scaleY(1);
+        }
+        51% {
+          transform: scaleY(-1);
+        }
+        62%,
+        100% {
+          transform: scaleY(0.35);
+        }
+      }
+
       /* ————— NAV ————— */
       nav {
         position: fixed;
@@ -1488,6 +1575,8 @@
         nav,
         .marquee,
         #offtheclock,
+        /* Cmd+P is the CV — a bird mid-flight would print onto it */
+        .bird,
         /* unpublished drafts are not CV material, and the backdrop is a screen
            effect that would print as a grey slab */
         #writing,
@@ -1657,6 +1746,31 @@
   <body>
     <div class="grain" aria-hidden="true"></div>
 
+    <!-- The hero footage already has herons and gulls drifting through it;
+         this carries one off the video and onto the rest of the page.
+
+         It rests at opacity 0 with no animation, which is what makes the
+         no-JS and prefers-reduced-motion cases free: the script never adds
+         .is-flying, so there is nothing for the reduced-motion block to undo.
+         The mark is deliberately symmetric — a gull at 20px has no readable
+         facing, which is what lets direction be animation-direction rather
+         than a second element holding a scaleX flip. -->
+    <svg
+      class="bird"
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.75"
+      stroke-linecap="round"
+    >
+      <!-- Body sits exactly on (12,12), the transform origin the flap mirrors
+           about, so the wings move and the body holds. The kink at the body
+           is the whole trick: control points that arrive horizontally give a
+           smooth U that reads as a smile, not a bird. -->
+      <path d="M3.5 5 Q8 6.5 12 12 Q16 6.5 20.5 5" />
+    </svg>
+
     <!-- NAV -->
     <!-- starts hidden, since the page opens on the masthead — set here rather
          than by the script so the name cannot flash before the first paint -->
@@ -1694,9 +1808,7 @@
             stroke="currentColor"
             stroke-width="1.6"
           >
-            <path
-              d="M20 14.2A8.5 8.5 0 1 1 9.8 4a6.6 6.6 0 0 0 10.2 10.2Z"
-            />
+            <path d="M20 14.2A8.5 8.5 0 1 1 9.8 4a6.6 6.6 0 0 0 10.2 10.2Z" />
           </svg>
         </button>
       </div>
@@ -2297,6 +2409,75 @@
         els.forEach(function (el) {
           io.observe(el);
         });
+      })();
+
+      // ————— BIRD —————
+      // Two birds live in the DOM; the second is a clone so the path data has
+      // one home. A flight sets the per-flight custom properties and adds
+      // .is-flying; animationend takes it off, which also stops the flap.
+      //
+      // No document.hidden guard on purpose: a hidden tab is not compositing,
+      // so a flight launched there costs nothing and completes unseen.
+      // Chained setTimeout rather than setInterval — the irregular cadence is
+      // the point, and the drift is welcome.
+      (function () {
+        var bird = document.querySelector(".bird");
+        if (!bird) return;
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+          return;
+
+        document.body.appendChild(bird.cloneNode(true));
+        var birds = document.querySelectorAll(".bird");
+
+        function rand(lo, hi) {
+          return lo + Math.random() * (hi - lo);
+        }
+
+        function launch(el, dir, delay) {
+          var w = rand(17, 25);
+          // A speed, not a duration: a fixed 20s crossing is ~72px/s on a
+          // desktop and ~20px/s on a phone, where it stops reading as a bird
+          // and starts reading as a floating logo.
+          var t = (window.innerWidth + w) / rand(62, 96);
+          // px off innerHeight rather than vh — iOS resolves vh against the
+          // large viewport and never updates it as the URL bar collapses.
+          // Floored at 150px to stay clear of nav::before, whose
+          // backdrop-filter runs 140px down and re-blurs that whole band
+          // every frame anything moves under it.
+          var y = Math.max(150, rand(0.2, 0.56) * window.innerHeight);
+          el.style.setProperty("--w", w.toFixed(1) + "px");
+          el.style.setProperty("--y", Math.round(y) + "px");
+          el.style.setProperty(
+            "--rise",
+            Math.round(rand(-0.05, 0.02) * window.innerHeight) + "px"
+          );
+          el.style.setProperty("--t", t.toFixed(1) + "s");
+          el.style.setProperty("--dir", dir);
+          el.style.setProperty("--fw", rand(2.1, 2.9).toFixed(2) + "s");
+          el.style.setProperty("--delay", delay.toFixed(1) + "s");
+          el.classList.add("is-flying");
+        }
+
+        birds.forEach(function (el) {
+          el.addEventListener("animationend", function (e) {
+            // Only the flight ends a flight. flap is infinite so it never
+            // fires one today, but it would bubble from the <path> if that
+            // ever changed.
+            if (e.target !== el) return;
+            el.classList.remove("is-flying");
+          });
+        });
+
+        function flight() {
+          // Shared direction, independent everything else: two birds crossing
+          // opposite ways in one window reads as a bug, two locked in
+          // parallel reads as a sprite sheet.
+          var dir = Math.random() < 0.5 ? "normal" : "reverse";
+          launch(birds[0], dir, 0);
+          if (Math.random() < 0.25) launch(birds[1], dir, rand(1.5, 3));
+          setTimeout(flight, rand(60000, 120000));
+        }
+        setTimeout(flight, rand(14000, 26000));
       })();
 
       // ————— OFF THE CLOCK —————
