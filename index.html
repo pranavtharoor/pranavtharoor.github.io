@@ -254,7 +254,7 @@
         transform: translate3d(-100%, 0, 0);
       }
       .bird.is-flying {
-        opacity: 0.26;
+        opacity: 0.38;
         animation: fly var(--t) linear var(--delay, 0s) var(--dir, normal)
           forwards;
       }
@@ -2434,7 +2434,7 @@
         }
 
         function launch(el, dir, delay) {
-          var w = rand(17, 25);
+          var w = rand(28, 40);
           // A speed, not a duration: a fixed 20s crossing is ~72px/s on a
           // desktop and ~20px/s on a phone, where it stops reading as a bird
           // and starts reading as a floating logo.
@@ -2466,6 +2466,23 @@
             if (e.target !== el) return;
             el.classList.remove("is-flying");
           });
+        });
+
+        // Type "bird" to summon one instead of waiting out the timer. Sits
+        // inside the reduced-motion guard above on purpose: if you have asked
+        // for no motion, a magic word should not override that.
+        var typed = "";
+        document.addEventListener("keydown", function (e) {
+          if (e.metaKey || e.ctrlKey || e.altKey) return;
+          if (e.key.length !== 1) return;
+          typed = (typed + e.key.toLowerCase()).slice(-4);
+          if (typed !== "bird") return;
+          typed = "";
+          // Prefer whichever bird is idle; if both are out, restart the first.
+          var el = birds[0].classList.contains("is-flying") ? birds[1] : birds[0];
+          el.classList.remove("is-flying");
+          void el.offsetWidth; // reflow, or re-adding the class will not restart
+          launch(el, Math.random() < 0.5 ? "normal" : "reverse", 0);
         });
 
         function flight() {
