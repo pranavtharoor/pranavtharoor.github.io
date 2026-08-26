@@ -1453,6 +1453,78 @@
         transform: none;
       }
 
+      /* ————— DISPERSAL —————
+         Type "flock" and whatever text is on screen comes apart into birds.
+         Scoped to the viewport, not to the masthead: the whole point of the
+         bird is that it crosses wherever you happen to be reading, so a
+         payoff that only plays in the hero would be invisible almost every
+         time it fired.
+
+         Declared here, after [data-reveal], on purpose — .dsp and
+         [data-reveal] have equal specificity, so source order is what
+         decides whose `transition` wins on the elements that carry both. */
+      .dsp {
+        transition: opacity 0.5s var(--ease), filter 0.5s var(--ease);
+      }
+      .dsp-out {
+        opacity: 0;
+        filter: blur(6px);
+      }
+      .crow {
+        position: fixed;
+        z-index: 95;
+        pointer-events: none;
+        color: var(--bone);
+        opacity: 0;
+        /* A gentle S rather than a hard ease-out: the bird settles into its
+           drift instead of being flung. */
+        animation: crow var(--d) cubic-bezier(0.3, 0.1, 0.3, 1) var(--delay)
+          forwards;
+      }
+      @keyframes crow {
+        0% {
+          /* Starts near glyph size, not at nothing — the bird should look
+             like it was already there in the shape of the letter, rather
+             than popping into being over the top of it. */
+          opacity: 0;
+          transform: translate3d(0, 0, 0) scale(0.7) rotate(0deg);
+        }
+        14% {
+          opacity: 0.85;
+        }
+        70% {
+          opacity: 0.5;
+        }
+        100% {
+          opacity: 0;
+          transform: translate3d(var(--dx), var(--dy), 0) scale(var(--s))
+            rotate(var(--rot));
+        }
+      }
+      /* Same flap as the drifting bird, wound tighter — a bird that has just
+         taken off beats faster than a cruising one — but not to a flutter. */
+      .crow path {
+        transform-box: view-box;
+        transform-origin: 50% 50%;
+        animation: flap var(--fw) ease-in-out infinite;
+      }
+      /* Clickable only while it is actually crossing. fill is none and the
+         hit path below is stroke-only, so the target is a thin band along
+         the bird rather than its whole square box — which is what keeps it
+         from swallowing clicks meant for the links it passes over. No
+         pointer cursor, deliberately: same reasoning as the footer clock,
+         the only tell should be that something happens. */
+      .bird-hit {
+        stroke: transparent;
+      }
+      /* pointer-events stays none on the <svg> itself: setting it to auto
+         there makes the whole square box a target, which is the click
+         interception this was meant to avoid. The child opts back in on its
+         own, so only the fat invisible stroke band is hittable. */
+      .bird.is-flying .bird-hit {
+        pointer-events: stroke;
+      }
+
       /* ————— REDUCED MOTION ————— */
       @media (prefers-reduced-motion: reduce) {
         html {
@@ -1769,6 +1841,11 @@
            is the whole trick: control points that arrive horizontally give a
            smooth U that reads as a smile, not a bird. -->
       <path d="M3.5 5 Q8 6.5 12 12 Q16 6.5 20.5 5" />
+      <!-- Invisible fat-stroke twin, purely a hit target. The visible stroke
+           is ~2.5px at full size, which is not a fair thing to ask anyone to
+           click on a moving object; this widens the band to ~11px without
+           widening it to the whole bounding box. -->
+      <path class="bird-hit" stroke-width="8" d="M3.5 5 Q8 6.5 12 12 Q16 6.5 20.5 5" />
     </svg>
 
     <!-- NAV -->
@@ -2466,23 +2543,158 @@
             if (e.target !== el) return;
             el.classList.remove("is-flying");
           });
+          // Catch the bird and the page goes with it. disperse() is hoisted,
+          // so it is fine to reference before its declaration below.
+          el.addEventListener("click", function () {
+            disperse();
+          });
         });
 
-        // Type "bird" to summon one instead of waiting out the timer. Sits
-        // inside the reduced-motion guard above on purpose: if you have asked
-        // for no motion, a magic word should not override that.
-        var typed = "";
-        document.addEventListener("keydown", function (e) {
-          if (e.metaKey || e.ctrlKey || e.altKey) return;
-          if (e.key.length !== 1) return;
-          typed = (typed + e.key.toLowerCase()).slice(-4);
-          if (typed !== "bird") return;
-          typed = "";
+        function summon() {
           // Prefer whichever bird is idle; if both are out, restart the first.
           var el = birds[0].classList.contains("is-flying") ? birds[1] : birds[0];
           el.classList.remove("is-flying");
           void el.offsetWidth; // reflow, or re-adding the class will not restart
           launch(el, Math.random() < 0.5 ? "normal" : "reverse", 0);
+        }
+
+        // ————— DISPERSAL —————
+        // Every glyph currently on screen, as a screen-space rect, plus the
+        // blocks that own them. Read with a Range rather than by wrapping
+        // each letter in a span: the masthead lines are an overflow:hidden
+        // mask around a transform animation, and splitting them would break
+        // the rise-in reveal. This measures without touching the DOM.
+        function visibleGlyphs(spots, blocks) {
+          var vw = window.innerWidth;
+          var vh = window.innerHeight;
+          var walker = document.createTreeWalker(
+            document.body,
+            NodeFilter.SHOW_TEXT,
+            null
+          );
+          var range = document.createRange();
+          var node;
+          while ((node = walker.nextNode())) {
+            var txt = node.nodeValue;
+            if (!txt.trim()) continue;
+            var el = node.parentElement;
+            if (!el || el.closest("script, style, nav, .crow, .bird")) continue;
+            var br = el.getBoundingClientRect();
+            if (br.bottom < 0 || br.top > vh || !br.width) continue;
+            var cs = getComputedStyle(el);
+            if (cs.visibility === "hidden" || parseFloat(cs.opacity) === 0)
+              continue;
+            var used = false;
+            for (var i = 0; i < txt.length; i++) {
+              if (!txt[i].trim()) continue;
+              range.setStart(node, i);
+              range.setEnd(node, i + 1);
+              var r = range.getBoundingClientRect();
+              if (!r.width || r.bottom < 0 || r.top > vh) continue;
+              if (r.right < 0 || r.left > vw) continue;
+              spots.push(r);
+              used = true;
+            }
+            if (used && blocks.indexOf(el) < 0) blocks.push(el);
+          }
+        }
+
+        function disperse() {
+          if (document.querySelector(".crow")) return; // already running
+          var spots = [];
+          var blocks = [];
+          visibleGlyphs(spots, blocks);
+          if (!spots.length) return;
+
+          // One bird per glyph would be ~1500 elements on a full screen of
+          // copy. Sample down instead — past roughly this many the effect
+          // reads the same and only the frame rate changes.
+          var CAP = 140;
+          var step = Math.max(1, Math.ceil(spots.length / CAP));
+          var vh = window.innerHeight;
+          var frag = document.createDocumentFragment();
+
+          // One heading for the whole flock, varied per bird. Radiating
+          // outward from the centre of the screen is what read as panic —
+          // birds leaving a place leave together, in a direction.
+          var driftX = (Math.random() < 0.5 ? -1 : 1) * rand(150, 300);
+          var driftY = -rand(210, 340);
+          // Top-to-bottom, shared by the birds and the fade below, so each
+          // line of type hands off to the birds standing on it instead of the
+          // whole block vanishing before any of them appear.
+          var WAVE = 0.6;
+
+          for (var i = 0; i < spots.length; i += step) {
+            var r = spots[i];
+            var px = r.left + r.width / 2;
+            var py = r.top + r.height / 2;
+            var w = rand(12, 26);
+            var el = bird.cloneNode(true);
+            el.removeAttribute("style");
+            el.setAttribute("class", "crow");
+            var hit = el.querySelector(".bird-hit");
+            if (hit) hit.remove(); // decoration only, never a click target
+            el.style.left = Math.round(px - w / 2) + "px";
+            el.style.top = Math.round(py - w / 2) + "px";
+            el.style.width = w.toFixed(1) + "px";
+            el.style.height = w.toFixed(1) + "px";
+            el.style.setProperty(
+              "--dx",
+              Math.round(driftX + rand(-95, 95)) + "px"
+            );
+            el.style.setProperty(
+              "--dy",
+              Math.round(driftY + rand(-80, 80)) + "px"
+            );
+            el.style.setProperty("--s", rand(1, 1.5).toFixed(2));
+            el.style.setProperty("--rot", Math.round(rand(-20, 20)) + "deg");
+            el.style.setProperty("--d", rand(2.6, 4).toFixed(2) + "s");
+            el.style.setProperty("--fw", rand(0.5, 0.85).toFixed(2) + "s");
+            el.style.setProperty(
+              "--delay",
+              ((py / vh) * WAVE + rand(0, 0.09)).toFixed(2) + "s"
+            );
+            el.addEventListener("animationend", function (e) {
+              if (e.target === this) this.remove();
+            });
+            frag.appendChild(el);
+          }
+          document.body.appendChild(frag);
+
+          blocks.forEach(function (b) {
+            var br = b.getBoundingClientRect();
+            var t = Math.max(0, Math.min(1, (br.top + br.height / 2) / vh));
+            b.style.transitionDelay = (t * WAVE).toFixed(2) + "s";
+            b.classList.add("dsp", "dsp-out");
+          });
+          setTimeout(function () {
+            blocks.forEach(function (b) {
+              b.style.transitionDelay = ""; // the page returns all at once
+              b.classList.remove("dsp-out");
+            });
+            setTimeout(function () {
+              blocks.forEach(function (b) {
+                b.classList.remove("dsp");
+              });
+            }, 900);
+          }, 2400);
+        }
+
+        // Magic words. Both sit inside the reduced-motion guard above on
+        // purpose: if you have asked for no motion, a magic word should not
+        // override that.
+        var typed = "";
+        document.addEventListener("keydown", function (e) {
+          if (e.metaKey || e.ctrlKey || e.altKey) return;
+          if (e.key.length !== 1) return;
+          typed = (typed + e.key.toLowerCase()).slice(-8);
+          if (typed.slice(-5) === "flock") {
+            typed = "";
+            disperse();
+          } else if (typed.slice(-4) === "bird") {
+            typed = "";
+            summon();
+          }
         });
 
         function flight() {
