@@ -7,7 +7,14 @@
     <!-- Stamps data-theme before the <style> below ever paints, so a stored
          preference that disagrees with the system (dark system, saved
          light choice) never flashes the wrong theme first. Blocking and
-         inline on purpose — anything deferred runs after first paint. -->
+         inline on purpose — anything deferred runs after first paint.
+         Also creates the theme-color meta tag here (not as a static tag
+         below) so browser chrome — Safari/Chrome's address bar, iOS's
+         status bar — starts in the right color instead of flashing dark
+         then correcting once the deferred toggle script runs. --ink's
+         two values, kept in sync by hand since a meta tag can't read a
+         CSS custom property; the toggle script further down keeps this
+         same tag in sync on every later theme change. -->
     <script>
       (function () {
         var stored = null;
@@ -17,6 +24,11 @@
         if (stored === "light" || stored === "dark") {
           document.documentElement.dataset.theme = stored;
         }
+        var isLight = stored === "light" || (!stored && window.matchMedia("(prefers-color-scheme: light)").matches);
+        var meta = document.createElement("meta");
+        meta.setAttribute("name", "theme-color");
+        meta.setAttribute("content", isLight ? "#f7f4ee" : "#0d0d0f");
+        document.head.appendChild(meta);
       })();
     </script>
     <meta charset="UTF-8" />
@@ -24,7 +36,7 @@
     <title>Pranav Tharoor</title>
     <meta
       name="description"
-      content="Building generative AI systems on Apple's Artificial Intelligence &amp; Data Platforms team. Based in Bangalore."
+      content="Building generative AI systems on Apple's Artificial Intelligence &amp; Data Platforms team, based in Bangalore. Portfolio, writing, and personal projects."
     />
     <link rel="canonical" href="https://pranavtharoor.com/" />
 
@@ -37,7 +49,7 @@
     <meta property="og:title" content="Pranav Tharoor" />
     <meta
       property="og:description"
-      content="Building generative AI systems on Apple's Artificial Intelligence &amp; Data Platforms team. Based in Bangalore."
+      content="Building generative AI systems on Apple's Artificial Intelligence &amp; Data Platforms team, based in Bangalore. Portfolio, writing, and personal projects."
     />
     <meta
       property="og:image"
@@ -51,7 +63,7 @@
     <meta name="twitter:title" content="Pranav Tharoor" />
     <meta
       name="twitter:description"
-      content="Building generative AI systems on Apple's Artificial Intelligence &amp; Data Platforms team. Based in Bangalore."
+      content="Building generative AI systems on Apple's Artificial Intelligence &amp; Data Platforms team, based in Bangalore. Portfolio, writing, and personal projects."
     />
     <meta
       name="twitter:image"
@@ -2929,6 +2941,7 @@
         var btn = document.querySelector("[data-theme-toggle]");
         if (!btn) return;
         var media = window.matchMedia("(prefers-color-scheme: light)");
+        var metaTheme = document.querySelector('meta[name="theme-color"]');
 
         function effective() {
           var stored = document.documentElement.dataset.theme;
@@ -2939,6 +2952,12 @@
           var next = effective() === "light" ? "dark" : "light";
           btn.setAttribute("aria-label", "Switch to " + next + " theme");
         }
+        // Keeps the Safari/Chrome chrome color (address bar, iOS status
+        // bar) matching --ink on every change, not just the head script's
+        // initial paint — same --ink values, kept in sync by hand.
+        function setMeta() {
+          if (metaTheme) metaTheme.setAttribute("content", effective() === "light" ? "#f7f4ee" : "#0d0d0f");
+        }
         setLabel();
 
         btn.addEventListener("click", function () {
@@ -2948,12 +2967,16 @@
             localStorage.setItem("theme", next);
           } catch (e) {}
           setLabel();
+          setMeta();
         });
 
         // No explicit choice yet: keep following the system live, same as
         // the no-JS media-query fallback does.
         media.addEventListener("change", function () {
-          if (!document.documentElement.dataset.theme) setLabel();
+          if (!document.documentElement.dataset.theme) {
+            setLabel();
+            setMeta();
+          }
         });
       })();
     </script>

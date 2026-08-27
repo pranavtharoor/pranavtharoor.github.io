@@ -5,8 +5,10 @@
          preference that disagrees with the system (dark system, saved
          light choice) never flashes the wrong theme first. Blocking and
          inline on purpose — anything deferred runs after first paint.
-         Identical to index.html's copy; this page has no build step to
-         share it from. -->
+         Also creates the theme-color meta tag here so Safari/Chrome's own
+         chrome (address bar, iOS status bar) starts in the right color
+         too. Identical to index.html's copy; this page has no build step
+         to share it from. -->
     <script>
       (function () {
         var stored = null;
@@ -16,6 +18,11 @@
         if (stored === "light" || stored === "dark") {
           document.documentElement.dataset.theme = stored;
         }
+        var isLight = stored === "light" || (!stored && window.matchMedia("(prefers-color-scheme: light)").matches);
+        var meta = document.createElement("meta");
+        meta.setAttribute("name", "theme-color");
+        meta.setAttribute("content", isLight ? "#f7f4ee" : "#0d0d0f");
+        document.head.appendChild(meta);
       })();
     </script>
     <meta charset="UTF-8" />
@@ -23,8 +30,9 @@
     <title>The AI Agent Protocol Stack - Pranav Tharoor</title>
     <meta
       name="description"
-      content="MCP, ACP, AHP and A2A. Four protocols, four different boundaries inside an AI agent, and which ones you probably need."
+      content="MCP, ACP, AHP and A2A: four protocols, four different boundaries inside an AI agent, and which ones you actually need - as an essay or a short film."
     />
+    <meta name="author" content="Pranav Tharoor" />
     <link rel="canonical" href="https://pranavtharoor.com/writing/protocol-stack.html" />
     <meta property="og:type" content="article" />
     <meta property="og:site_name" content="Pranav Tharoor" />
@@ -32,15 +40,55 @@
     <meta property="og:title" content="The AI Agent Protocol Stack" />
     <meta
       property="og:description"
-      content="MCP, ACP, AHP and A2A. Four protocols, four different boundaries inside an AI agent, and which ones you probably need."
+      content="MCP, ACP, AHP and A2A: four protocols, four different boundaries inside an AI agent, and which ones you actually need - as an essay or a short film."
     />
     <meta property="og:image" content="https://pranavtharoor.com/img/og.jpg?v=1" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="The AI Agent Protocol Stack" />
+    <!-- article:* has no effect outside og:type="article", which this page
+         sets above. published_time and modified_time are the same value
+         for now — nothing has revised this piece since it shipped. -->
+    <meta property="article:published_time" content="2026-08-27" />
+    <meta property="article:modified_time" content="2026-08-27" />
+    <meta property="article:author" content="https://pranavtharoor.com/" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="The AI Agent Protocol Stack" />
     <meta
       name="twitter:description"
-      content="MCP, ACP, AHP and A2A. Four protocols, four different boundaries inside an AI agent, and which ones you probably need."
+      content="MCP, ACP, AHP and A2A: four protocols, four different boundaries inside an AI agent, and which ones you actually need - as an essay or a short film."
     />
+    <!-- Article structured data — lets Google show this as a rich result
+         (author, date) instead of a bare link. datePublished is a specific
+         date on purpose (the byline itself deliberately stays month-only,
+         "August 2026", per house style: an essay reads as a considered
+         piece, not a dated blog post). -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "The AI Agent Protocol Stack",
+        "description": "MCP, ACP, AHP and A2A: four protocols, four different boundaries inside an AI agent, and which ones you actually need - as an essay or a short film.",
+        "image": "https://pranavtharoor.com/img/og.jpg?v=1",
+        "datePublished": "2026-08-27",
+        "dateModified": "2026-08-27",
+        "author": {
+          "@type": "Person",
+          "name": "Pranav Tharoor",
+          "url": "https://pranavtharoor.com/"
+        },
+        "publisher": {
+          "@type": "Person",
+          "name": "Pranav Tharoor",
+          "url": "https://pranavtharoor.com/"
+        },
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": "https://pranavtharoor.com/writing/protocol-stack.html"
+        }
+      }
+    </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
@@ -1078,6 +1126,7 @@
           var btn = document.querySelector("[data-theme-toggle]");
           if (!btn) return;
           var media = window.matchMedia("(prefers-color-scheme: light)");
+          var metaTheme = document.querySelector('meta[name="theme-color"]');
 
           function effective() {
             var stored = document.documentElement.dataset.theme;
@@ -1088,6 +1137,9 @@
             var next = effective() === "light" ? "dark" : "light";
             btn.setAttribute("aria-label", "Switch to " + next + " theme");
           }
+          function setMeta() {
+            if (metaTheme) metaTheme.setAttribute("content", effective() === "light" ? "#f7f4ee" : "#0d0d0f");
+          }
           setLabel();
 
           btn.addEventListener("click", function () {
@@ -1097,10 +1149,14 @@
               localStorage.setItem("theme", next);
             } catch (e) {}
             setLabel();
+            setMeta();
           });
 
           media.addEventListener("change", function () {
-            if (!document.documentElement.dataset.theme) setLabel();
+            if (!document.documentElement.dataset.theme) {
+              setLabel();
+              setMeta();
+            }
           });
         })();
 
