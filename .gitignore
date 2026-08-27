@@ -2,4 +2,18 @@
 .claude/skills/
 .claude/worktrees/
 
+# Agent tooling / skills state - not site content
+.agents/
+AGENTS.md
+skills-lock.json
+
+# Scratch / lab pages - noindex experiments, never linked from the real site
+batur-stage.html
+depth-lab.html
+img/batur-foreground.png
+
+# Video authoring workspace - only the rendered .mp4 in writing/video/ ships
+writing/protocol-stack-video/
+writing/audio/
+
 .DS_Store

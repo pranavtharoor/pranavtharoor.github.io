@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Stamps data-theme before the <style> below ever paints, so a stored
+         preference that disagrees with the system (dark system, saved
+         light choice) never flashes the wrong theme first. Blocking and
+         inline on purpose — anything deferred runs after first paint.
+         Identical to index.html's copy; this page has no build step to
+         share it from. -->
+    <script>
+      (function () {
+        var stored = null;
+        try {
+          stored = localStorage.getItem("theme");
+        } catch (e) {}
+        if (stored === "light" || stored === "dark") {
+          document.documentElement.dataset.theme = stored;
+        }
+      })();
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The AI Agent Protocol Stack - Pranav Tharoor</title>
+    <meta
+      name="description"
+      content="MCP, ACP, AHP and A2A. Four protocols, four different boundaries inside an AI agent, and which ones you probably need."
+    />
+    <link rel="canonical" href="https://pranavtharoor.com/writing/protocol-stack.html" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="Pranav Tharoor" />
+    <meta property="og:url" content="https://pranavtharoor.com/writing/protocol-stack.html" />
+    <meta property="og:title" content="The AI Agent Protocol Stack" />
+    <meta
+      property="og:description"
+      content="MCP, ACP, AHP and A2A. Four protocols, four different boundaries inside an AI agent, and which ones you probably need."
+    />
+    <meta property="og:image" content="https://pranavtharoor.com/img/og.jpg?v=1" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="The AI Agent Protocol Stack" />
+    <meta
+      name="twitter:description"
+      content="MCP, ACP, AHP and A2A. Four protocols, four different boundaries inside an AI agent, and which ones you probably need."
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..500&amp;family=Hanken+Grotesk:wght@300;400;500&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* ============================================================
+         TOKENS — identical values to index.html, kept local rather
+         than shared because the site has no build step: every page
+         is self-contained by convention (see /surface, /404).
+         ============================================================ */
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      /* ————— THEME —————
+         Same architecture as index.html: a default block, a system-
+         preference media query for no-JS/no-choice-yet, then explicit
+         [data-theme] overrides that outrank both once a choice is made.
+         --bone-rgb/--ink-rgb exist only so the handful of hardcoded
+         rgba(...) tints below (topbar glass, subtitle/table opacities,
+         the .dg diagram tint) can flip with the theme instead of staying
+         fixed to the dark-mode color — see each rgba(var(--bone-rgb), …)
+         usage further down. */
+      :root {
+        --ink: #0d0d0f;
+        --ink-soft: #131315;
+        --bone: #eae7e1;
+        --muted: #8f8c85;
+        --gold: #c2a87c;
+        --line: rgba(234, 231, 225, 0.12);
+        --line-strong: rgba(234, 231, 225, 0.22);
+        --bone-rgb: 234, 231, 225;
+        --ink-rgb: 13, 13, 15;
+        --serif: "Fraunces", Georgia, serif;
+        --sans: "Hanken Grotesk", -apple-system, sans-serif;
+        --mono: "IBM Plex Mono", monospace;
+        --ease: cubic-bezier(0.19, 1, 0.22, 1);
+      }
+      @media (prefers-color-scheme: light) {
+        :root {
+          --ink: #f7f4ee;
+          --ink-soft: #efebe2;
+          --bone: #1b1916;
+          --muted: #66605a;
+          --gold: #8a6b35;
+          --line: rgba(20, 18, 14, 0.12);
+          --line-strong: rgba(20, 18, 14, 0.22);
+          --bone-rgb: 20, 18, 14;
+          --ink-rgb: 247, 244, 238;
+        }
+      }
+      :root[data-theme="dark"] {
+        --ink: #0d0d0f;
+        --ink-soft: #131315;
+        --bone: #eae7e1;
+        --muted: #8f8c85;
+        --gold: #c2a87c;
+        --line: rgba(234, 231, 225, 0.12);
+        --line-strong: rgba(234, 231, 225, 0.22);
+        --bone-rgb: 234, 231, 225;
+        --ink-rgb: 13, 13, 15;
+      }
+      :root[data-theme="light"] {
+        --ink: #f7f4ee;
+        --ink-soft: #efebe2;
+        --bone: #1b1916;
+        --muted: #66605a;
+        --gold: #8a6b35;
+        --line: rgba(20, 18, 14, 0.12);
+        --line-strong: rgba(20, 18, 14, 0.22);
+        --bone-rgb: 20, 18, 14;
+        --ink-rgb: 247, 244, 238;
+      }
+      html { scroll-behavior: smooth; background: var(--ink); }
+      body {
+        font-family: var(--sans);
+        font-weight: 300;
+        background: var(--ink);
+        color: var(--bone);
+        line-height: 1.6;
+        font-size: 16px;
+        overflow-x: hidden;
+      }
+      ::selection { background: var(--gold); color: var(--ink); }
+      em { font-family: var(--serif); font-style: italic; font-weight: 340; }
+      .mono {
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        font-weight: 400;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      a { color: inherit; }
+      :focus-visible {
+        outline: 1px solid var(--gold);
+        outline-offset: 4px;
+      }
+      .skip-link {
+        position: absolute;
+        top: -100%;
+        left: 5vw;
+        z-index: 500;
+        background: var(--ink);
+        color: var(--bone);
+        padding: 0.8rem 1.2rem;
+        border: 1px solid var(--line-strong);
+      }
+      .skip-link:focus { top: 1rem; }
+
+      /* ————— GRAIN (same fixed overlay as the main site) ————— */
+      .grain {
+        position: fixed;
+        inset: -120px;
+        z-index: 300;
+        pointer-events: none;
+        opacity: 0.05;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='280'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        animation: grain 1.4s steps(7) infinite;
+      }
+      @keyframes grain {
+        0% { transform: translate(0, 0); }
+        20% { transform: translate(-40px, 30px); }
+        40% { transform: translate(30px, -50px); }
+        60% { transform: translate(-50px, -20px); }
+        80% { transform: translate(40px, 40px); }
+        100% { transform: translate(0, 0); }
+      }
+
+      /* ————— READING PROGRESS ————— */
+      /* Tracks scroll through the article — the page has exactly one
+         persistent surface now, so this always means the same thing. */
+      .progress {
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        height: 2px;
+        z-index: 210;
+        background: var(--ink);
+      }
+      .progress-fill {
+        height: 100%;
+        width: 100%;
+        background: var(--gold);
+        transform-origin: left;
+        transform: scaleX(0);
+      }
+
+      /* ————— TOP BAR ————— */
+      .topbar {
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        z-index: 200;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.5rem;
+        height: 60px;
+        margin-top: 2px;
+        padding: 0 5vw;
+        background: rgba(var(--ink-rgb), 0.55);
+        backdrop-filter: blur(14px) saturate(140%);
+        -webkit-backdrop-filter: blur(14px) saturate(140%);
+        border-bottom: 1px solid var(--line);
+      }
+      .topbar-back {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        color: var(--muted);
+        text-decoration: none;
+        transition: color 0.2s ease;
+        white-space: nowrap;
+      }
+      .topbar-back:hover { color: var(--bone); }
+      .topbar-back svg { width: 13px; height: 13px; display: block; }
+      /* Groups the kicker and the toggle so .topbar's space-between still
+         sees exactly two children — same reason index.html's nav wraps
+         its links and toggle in .nav-right. */
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+      }
+      .topbar-kicker { color: var(--muted); }
+      /* Theme toggle — plain icon button, same restrained language as the
+         back link: no fill, no border, a hover tint and nothing else.
+         Unlike index.html's nav toggle, this one sits on the topbar's own
+         ink-tinted glass (rgba(var(--ink-rgb), 0.55)), which already flips
+         with the theme, so var(--muted) has enough contrast in both
+         themes without index.html's hardcoded light-mode override. */
+      .theme-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: none;
+        border: none;
+        padding: 0.4rem;
+        margin: -0.4rem;
+        color: var(--muted);
+        cursor: pointer;
+        transition: color 0.2s ease;
+      }
+      .theme-toggle:hover { color: var(--gold); }
+      .theme-toggle svg { width: 15px; height: 15px; display: block; }
+      /* Icon shown = theme a click switches to. The inline script in <head>
+         always resolves and stamps data-theme before first paint (including
+         mirroring system preference when nothing has been chosen by hand),
+         so these two rules are the only ones that matter with JS on. The
+         media query is strictly a no-JS fallback. */
+      .theme-toggle [data-icon-moon] { display: none; }
+      :root[data-theme="light"] .theme-toggle [data-icon-sun] { display: none; }
+      :root[data-theme="light"] .theme-toggle [data-icon-moon] { display: block; }
+      @media (prefers-color-scheme: light) {
+        :root:not([data-theme]) .theme-toggle [data-icon-sun] { display: none; }
+        :root:not([data-theme]) .theme-toggle [data-icon-moon] { display: block; }
+      }
+
+      /* ============================================================
+         ARTICLE HEAD / FOOT
+         ============================================================ */
+      /* Same box as .rd-article below (42rem, centered, no horizontal
+         padding of its own) rather than a wider one independently
+         centered - two different-width boxes each centered on their own
+         don't share a left edge, which was the actual bug: at 1600px
+         the title was starting 176px left of the body text. */
+      .essay-head {
+        padding: calc(60px + 14vh) 0 3vh;
+        max-width: 42rem;
+        margin: 0 auto;
+      }
+      .essay-title {
+        font-family: var(--serif);
+        font-weight: 400;
+        font-size: clamp(2.2rem, 4.6vw, 3.3rem);
+        line-height: 1.08;
+        letter-spacing: -0.01em;
+      }
+      .essay-subtitle {
+        margin-top: 1.6rem;
+        font-size: clamp(1rem, 1.5vw, 1.15rem);
+        color: rgba(var(--bone-rgb), 0.72);
+        line-height: 1.55;
+      }
+
+      /* The film entry point, in the byline row so "~6 min read" and
+         "3:55" sit as one decision (read this, or watch it) rather than
+         a button parked above a separate metadata line. But it is the
+         one live item in a row of static facts, and the most-produced
+         thing on the page - narrated, multi-scene, rendered - so unlike
+         its neighbours it reads bone/gold, not muted, and keeps the noun
+         ("watch the film") rather than shrinking to a bare duration. */
+      .watch-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        color: var(--bone);
+        font: inherit;
+        letter-spacing: inherit;
+        text-transform: inherit;
+        transition: color 0.2s ease;
+      }
+      .watch-cta svg {
+        width: 9px;
+        height: 9px;
+        display: block;
+        color: var(--gold);
+        /* optically centred: a triangle sits visually low against caps */
+        margin-top: -1px;
+      }
+      .watch-cta:hover,
+      .watch-cta:focus-visible { color: var(--gold); }
+
+      .essay-meta {
+        margin-top: 2.4rem;
+        display: flex;
+        gap: 2rem;
+        flex-wrap: wrap;
+        color: var(--muted);
+        padding-top: 1.4rem;
+        border-top: 1px solid var(--line);
+      }
+
+      .essay-foot {
+        padding: 10vh 5vw 8vh;
+        border-top: 1px solid var(--line);
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        color: var(--muted);
+      }
+      .essay-foot a {
+        color: var(--bone);
+        text-decoration: none;
+        padding-bottom: 2px;
+        background-image: linear-gradient(currentColor, currentColor);
+        background-size: 0% 1px;
+        background-position: left bottom;
+        background-repeat: no-repeat;
+        transition: background-size 0.35s var(--ease), color 0.2s ease;
+      }
+      .essay-foot a:hover { color: var(--gold); background-size: 100% 1px; }
+
+      /* ============================================================
+         READ — the article. Always in the document; Watch is an
+         overlay on top of it, not a second copy of the content.
+         ============================================================ */
+      .rd-root { padding: 0 5vw 12vh; }
+      .rd-article {
+        max-width: 42rem;
+        margin: 0 auto;
+      }
+      .rd-toc {
+        margin: 2vh auto 8vh;
+        max-width: 42rem;
+        border-bottom: 1px solid var(--line);
+        padding: 0 0 1.6rem;
+      }
+      .rd-toc ol { list-style: none; counter-reset: toc; columns: 2; column-gap: 2rem; }
+      .rd-toc li { counter-increment: toc; margin-bottom: 0.55rem; break-inside: avoid; }
+      .rd-toc a {
+        display: flex;
+        gap: 0.6rem;
+        text-decoration: none;
+        color: var(--muted);
+        font-size: 0.88rem;
+        transition: color 0.2s ease;
+      }
+      .rd-toc a:hover { color: var(--bone); }
+      .rd-toc a::before {
+        content: counter(toc, decimal-leading-zero);
+        font-family: var(--mono);
+        color: var(--gold);
+        flex: none;
+      }
+
+      .rd-section { padding: 6vh 0; border-top: 1px solid var(--line); }
+      .rd-section:first-of-type { border-top: none; padding-top: 0; }
+      .rd-section h2 {
+        font-family: var(--serif);
+        font-weight: 400;
+        font-size: clamp(1.7rem, 3.2vw, 2.4rem);
+        line-height: 1.1;
+        letter-spacing: -0.005em;
+      }
+      .rd-section h2 .rd-num { color: var(--gold); font-family: var(--mono); font-size: 0.9rem; display: block; margin-bottom: 0.8rem; }
+      .rd-section h3 {
+        margin-top: 2.2rem;
+        font-family: var(--serif);
+        font-weight: 400;
+        font-size: 1.3rem;
+      }
+      .rd-section p {
+        margin-top: 1.2rem;
+        font-size: 1.02rem;
+        line-height: 1.85;
+        color: rgba(var(--bone-rgb), 0.86);
+      }
+      .rd-section p:first-of-type { margin-top: 1.6rem; }
+      .rd-section ul, .rd-section ol.rd-list {
+        margin-top: 1.2rem;
+        padding-left: 1.3rem;
+        color: rgba(var(--bone-rgb), 0.86);
+        font-size: 1.02rem;
+        line-height: 1.8;
+      }
+      .rd-section li { margin-top: 0.5rem; }
+      .rd-section a { color: var(--bone); text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 3px; }
+      .rd-section a:hover { text-decoration-color: var(--gold); }
+      .rd-lede {
+        font-family: var(--serif);
+        font-size: clamp(1.2rem, 2vw, 1.5rem);
+        line-height: 1.55;
+        color: var(--bone);
+      }
+      .rd-quote {
+        margin: 1.8rem 0;
+        padding: 0.2rem 0 0.2rem 1.4rem;
+        border-left: 1px solid var(--gold);
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: 1.08rem;
+        color: rgba(var(--bone-rgb), 0.85);
+      }
+      .rd-note {
+        margin-top: 1.6rem;
+        padding: 1.1rem 1.3rem;
+        border: 1px solid var(--line-strong);
+        font-size: 0.92rem;
+        line-height: 1.7;
+        color: var(--muted);
+      }
+      .rd-note b { color: var(--bone); font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; display: block; margin-bottom: 0.5rem; }
+
+      /* ————— DIAGRAMS —————
+         Drawn rather than typed. The old versions were monospace art, which
+         meant every relationship had to be an arrow; containment, grouping
+         and opacity were not available, so "the client lives inside the
+         host" had to be said in prose next to the picture instead of shown
+         in it. These use nested rectangles for containment, a dashed
+         enclosure for a logical grouping, and gold only on the seam being
+         discussed - the same restraint as the rest of the page, no fills,
+         no rounded corners, no shadows.
+
+         min-width plus a scrolling wrapper: below ~420px the labels stop
+         being legible if the drawing is allowed to shrink to fit. */
+      .dg { margin-top: 1.9rem; overflow-x: auto; }
+      .dg svg { display: block; width: 100%; min-width: 420px; height: auto; }
+      .dg-cap {
+        margin-top: 0.85rem;
+        font-family: var(--mono);
+        font-size: 0.64rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .dg .node { fill: none; stroke: var(--line-strong); }
+      .dg .tint { fill: rgba(var(--bone-rgb), 0.035); stroke: none; }
+      .dg .zone { fill: none; stroke: var(--line); stroke-dasharray: 3 4; }
+      .dg .flow { stroke: var(--muted); fill: none; }
+      .dg .seam { stroke: var(--gold); }
+      .dg .seam-soft { stroke: var(--gold); opacity: 0.45; stroke-dasharray: 3 4; }
+      .dg .lbl {
+        font-family: var(--mono);
+        font-size: 9px;
+        letter-spacing: 0.1em;
+        fill: var(--bone);
+      }
+      .dg .sub {
+        font-family: var(--mono);
+        font-size: 7.5px;
+        letter-spacing: 0.06em;
+        fill: var(--muted);
+      }
+      .dg .gold {
+        font-family: var(--mono);
+        font-size: 8.5px;
+        letter-spacing: 0.14em;
+        fill: var(--gold);
+      }
+      .dg .dim { opacity: 0.32; }
+
+      /* Six columns of comparison do not fit a 42rem reading measure, which
+         is why this was squeezed into a scrollbar. Break it out of the text
+         column and centre it on the page instead; prose stays at its
+         comfortable width and the table gets the room it actually needs. */
+      .rd-table-wrap {
+        margin-top: 1.8rem;
+        width: min(70rem, 90vw);
+        margin-left: 50%;
+        transform: translateX(-50%);
+        overflow-x: auto;
+        border-top: 1px solid var(--line-strong);
+      }
+      table.rd-table { border-collapse: collapse; width: 100%; min-width: 860px; font-size: 0.86rem; }
+      table.rd-table caption { text-align: left; color: var(--muted); font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.8rem 0; }
+      table.rd-table th, table.rd-table td {
+        text-align: left;
+        vertical-align: top;
+        padding: 0.9rem 1.1rem 0.9rem 0;
+        border-bottom: 1px solid var(--line);
+      }
+      table.rd-table th {
+        font-family: var(--mono);
+        font-size: 0.66rem;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        color: var(--gold);
+        font-weight: 400;
+      }
+      table.rd-table td { color: rgba(var(--bone-rgb), 0.82); line-height: 1.55; }
+      table.rd-table td.rd-protocol { color: var(--bone); font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.04em; }
+
+      /* ============================================================
+         WATCH — a lightbox overlay around the rendered film. It plays
+         on top of the article and closes back into it, not a separate
+         page state.
+         ============================================================ */
+      .watch {
+        position: fixed;
+        inset: 0;
+        z-index: 400;
+        background: var(--ink);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .watch[hidden] { display: none; }
+      .watch-video { width: 100%; height: 100%; object-fit: contain; }
+      .watch-close {
+        position: absolute;
+        top: 1.4rem;
+        right: 1.4rem;
+        background: none;
+        border: none;
+        color: var(--bone);
+        cursor: pointer;
+        padding: 0.85rem;
+        margin: -0.55rem;
+        display: flex;
+        z-index: 1;
+      }
+      .watch-close svg { width: 16px; height: 16px; display: block; }
+      .watch-close:hover { color: var(--gold); }
+
+      /* ============================================================
+         REDUCED MOTION
+         ============================================================ */
+      @media (prefers-reduced-motion: reduce) {
+        html { scroll-behavior: auto; }
+        .grain { animation: none; }
+      }
+
+      @media (max-width: 720px) {
+        .topbar { padding: 0 6vw; gap: 0.8rem; }
+        .topbar-kicker { display: none; }
+        .rd-root { padding-left: 6vw; padding-right: 6vw; }
+        .rd-toc ol { columns: 1; }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div class="grain" aria-hidden="true"></div>
+
+    <div class="progress" aria-hidden="true"><div class="progress-fill" data-progress-fill></div></div>
+
+    <header class="topbar">
+      <a class="topbar-back mono" href="/#writing-top">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="m11 5-6 7 6 7M6 12h13" /></svg>
+        <span>Writing</span>
+      </a>
+      <div class="topbar-right">
+        <span class="topbar-kicker mono">The AI Agent Protocol Stack</span>
+        <button type="button" class="theme-toggle" data-theme-toggle aria-label="Switch to light theme">
+          <svg data-icon-sun viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <circle cx="12" cy="12" r="4.2" />
+            <path d="M12 2.5v2.4M12 19.1v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7" />
+          </svg>
+          <svg data-icon-moon viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M20 14.2A8.5 8.5 0 1 1 9.8 4a6.6 6.6 0 0 0 10.2 10.2Z" />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <main id="main">
+      <article class="rd-root">
+        <header class="essay-head">
+          <h1 class="essay-title">The AI Agent Protocol Stack</h1>
+          <p class="essay-subtitle">Four protocols, four different boundaries inside an AI agent, and which ones you probably need.</p>
+
+          <div class="essay-meta mono">
+            <span>Pranav Tharoor</span>
+            <span>August 2026</span>
+            <span>~6 min read</span>
+            <button type="button" class="watch-cta" data-watch-open>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor" /></svg>
+              <span>Watch the film, 3:55</span>
+            </button>
+          </div>
+        </header>
+
+        <div class="rd-article">
+          <nav class="rd-toc" aria-label="Table of contents">
+            <ol>
+              <li><a href="#rd-1">Introduction</a></li>
+              <li><a href="#rd-2">One thing, several jobs</a></li>
+              <li><a href="#rd-3">MCP</a></li>
+              <li><a href="#rd-4">ACP</a></li>
+              <li><a href="#rd-5">AHP</a></li>
+              <li><a href="#rd-6">A2A</a></li>
+              <li><a href="#rd-7">Side by side</a></li>
+              <li><a href="#rd-8">How they fit together</a></li>
+              <li><a href="#rd-9">What this means for builders</a></li>
+              <li><a href="#rd-10">What's still unclear</a></li>
+              <li><a href="#rd-11">Conclusion</a></li>
+            </ol>
+          </nav>
+
+          <section class="rd-section" id="rd-1">
+            <h2><span class="rd-num mono">01</span>Introduction</h2>
+            <p class="rd-lede">Four protocols have appeared around AI agents in about eighteen months: MCP, ACP, AHP and A2A. They come from four different companies, and none of the specs reference the other three.</p>
+            <p>What I find interesting is that they aren't competing. Each one claims a different seam inside the same kind of system, and the seams barely overlap.</p>
+            <p>Accurate as of August 2026. All four are moving quickly, so check the source specs before you build against any of them.</p>
+          </section>
+
+          <section class="rd-section" id="rd-2">
+            <h2><span class="rd-num mono">02</span>The problem with treating "the agent" as one thing</h2>
+            <p>Most agent products are one process. A server renders a chat UI, holds the conversation, calls a model, and runs tool calls in the same request handler. That's a fine way to build the first version, and it's why the internal seams stay invisible until you have to cross one.</p>
+            <p>Pull them apart and there are five roles doing different jobs.</p>
+
+            <div class="dg">
+              <svg viewBox="0 0 620 196" role="img" aria-label="Five roles inside what is usually one process: client, host, runtime and tools, plus an external agent outside it.">
+                <rect class="zone" x="8" y="30" width="604" height="74" />
+                <text class="sub" x="8" y="22">ONE PROCESS, USUALLY</text>
+
+                <rect class="node" x="20" y="44" width="130" height="46" />
+                <text class="lbl" x="85" y="64" text-anchor="middle">CLIENT</text>
+                <text class="sub" x="85" y="79" text-anchor="middle">renders the chat</text>
+
+                <rect class="node" x="166" y="44" width="130" height="46" />
+                <text class="lbl" x="231" y="64" text-anchor="middle">HOST</text>
+                <text class="sub" x="231" y="79" text-anchor="middle">owns the session</text>
+
+                <rect class="node" x="312" y="44" width="140" height="46" />
+                <text class="lbl" x="382" y="64" text-anchor="middle">RUNTIME</text>
+                <text class="sub" x="382" y="79" text-anchor="middle">does the reasoning</text>
+
+                <rect class="node" x="468" y="44" width="126" height="46" />
+                <text class="lbl" x="531" y="64" text-anchor="middle">TOOLS</text>
+                <text class="sub" x="531" y="79" text-anchor="middle">touches the world</text>
+
+                <line class="seam-soft" x1="158" y1="36" x2="158" y2="98" />
+                <line class="seam-soft" x1="304" y1="36" x2="304" y2="98" />
+                <line class="seam-soft" x1="460" y1="36" x2="460" y2="98" />
+
+                <line class="flow" x1="382" y1="104" x2="382" y2="140" />
+                <rect class="node" x="312" y="140" width="140" height="42" />
+                <text class="lbl" x="382" y="158" text-anchor="middle">ANOTHER AGENT</text>
+                <text class="sub" x="382" y="172" text-anchor="middle">someone else's system</text>
+              </svg>
+              <div class="dg-cap">Gold marks a seam. Three of them sit inside one process; the fourth crosses out of it.</div>
+            </div>
+
+            <p>None of this is new. It's the same decomposition any distributed system arrives at eventually. What's new is that each of those seams now has a named protocol claiming it.</p>
+          </section>
+
+          <section class="rd-section" id="rd-3">
+            <h2><span class="rd-num mono">03</span>MCP, the Model Context Protocol</h2>
+            <p>MCP covers the boundary between a runtime and anything it can read or act on. Anthropic published it in November 2024 and handed governance to the Linux Foundation a year later. It's the closest thing here to a settled standard.</p>
+            <p>The vocabulary trips people up, so it's worth drawing. The Host is the application itself. It creates one Client per Server, a dedicated connection each.</p>
+
+            <div class="dg">
+              <svg viewBox="0 0 620 200" role="img" aria-label="An MCP host containing one client per server, each connected one to one.">
+                <defs>
+                  <marker id="a3" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+                    <path d="M0 1 L7 4 L0 7" fill="none" stroke="var(--gold)" stroke-width="1" />
+                  </marker>
+                </defs>
+
+                <rect class="tint" x="14" y="26" width="250" height="160" />
+                <rect class="node" x="14" y="26" width="250" height="160" />
+                <text class="lbl" x="30" y="48">MCP HOST</text>
+                <text class="sub" x="30" y="62">the AI application</text>
+
+                <rect class="node" x="150" y="78" width="98" height="26" />
+                <text class="sub" x="199" y="95" text-anchor="middle">CLIENT</text>
+                <rect class="node" x="150" y="116" width="98" height="26" />
+                <text class="sub" x="199" y="133" text-anchor="middle">CLIENT</text>
+                <rect class="node" x="150" y="154" width="98" height="26" />
+                <text class="sub" x="199" y="171" text-anchor="middle">CLIENT</text>
+
+                <line class="seam" x1="248" y1="91" x2="424" y2="91" marker-end="url(#a3)" />
+                <line class="seam" x1="248" y1="129" x2="424" y2="129" marker-end="url(#a3)" />
+                <line class="seam" x1="248" y1="167" x2="424" y2="167" marker-end="url(#a3)" />
+                <text class="gold" x="336" y="72" text-anchor="middle">MCP</text>
+
+                <rect class="node" x="430" y="78" width="176" height="26" />
+                <text class="sub" x="518" y="95" text-anchor="middle">FILESYSTEM SERVER</text>
+                <rect class="node" x="430" y="116" width="176" height="26" />
+                <text class="sub" x="518" y="133" text-anchor="middle">DATABASE SERVER</text>
+                <rect class="node" x="430" y="154" width="176" height="26" />
+                <text class="sub" x="518" y="171" text-anchor="middle">SENTRY SERVER</text>
+              </svg>
+              <div class="dg-cap">One client per server, never a pool. The host is the thing you'd call "the app".</div>
+            </div>
+
+            <p>A server offers three things: tools, which are functions to call; resources, which are read-only context; and prompts, which are reusable templates. Clients ask what's available before invoking anything, which is what lets one host federate many servers into a single tool registry instead of hardcoding them.</p>
+            <div class="rd-quote">"MCP focuses solely on the protocol for context exchange."</div>
+            <p>That line from the spec places it correctly. It isn't an agent protocol. It says nothing about sessions, about several clients sharing one, or about two agents talking to each other.</p>
+          </section>
+
+          <section class="rd-section" id="rd-4">
+            <h2><span class="rd-num mono">04</span>ACP, the Agent Client Protocol</h2>
+            <p>ACP covers one client talking to one agent, and it was designed with code editors in mind. Zed released it in 2025; JetBrains and a long list of agents have picked it up since, which means an editor and an agent no longer need a custom integration per pair.</p>
+
+            <div class="dg">
+              <svg viewBox="0 0 620 186" role="img" aria-label="ACP as a single bilateral seam between one editor and one agent, carrying prompts, streamed output, tool calls and permission requests.">
+                <defs>
+                  <marker id="a4r" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+                    <path d="M0 1 L7 4 L0 7" fill="none" stroke="var(--muted)" stroke-width="1" />
+                  </marker>
+                </defs>
+
+                <rect class="node" x="14" y="36" width="132" height="114" />
+                <text class="lbl" x="80" y="88" text-anchor="middle">EDITOR</text>
+                <text class="sub" x="80" y="103" text-anchor="middle">one client</text>
+
+                <line class="seam" x1="310" y1="20" x2="310" y2="43" />
+                <line class="seam" x1="310" y1="57" x2="310" y2="66" />
+                <line class="seam" x1="310" y1="80" x2="310" y2="88" />
+                <line class="seam" x1="310" y1="102" x2="310" y2="111" />
+                <line class="seam" x1="310" y1="125" x2="310" y2="166" />
+                <text class="gold" x="310" y="14" text-anchor="middle">ACP</text>
+
+                <line class="flow" x1="156" y1="59" x2="464" y2="59" marker-end="url(#a4r)" />
+                <text class="sub" x="310" y="53" text-anchor="middle">PROMPT</text>
+
+                <line class="flow" x1="464" y1="82" x2="156" y2="82" marker-end="url(#a4r)" />
+                <text class="sub" x="310" y="76" text-anchor="middle">STREAMED OUTPUT</text>
+
+                <line class="flow" x1="464" y1="104" x2="156" y2="104" marker-end="url(#a4r)" />
+                <text class="sub" x="310" y="98" text-anchor="middle">TOOL CALL REQUEST</text>
+
+                <line class="flow" x1="156" y1="127" x2="464" y2="127" marker-end="url(#a4r)" />
+                <text class="sub" x="310" y="121" text-anchor="middle">PERMISSION GRANTED</text>
+
+                <rect class="node" x="474" y="36" width="132" height="114" />
+                <text class="lbl" x="540" y="88" text-anchor="middle">AGENT</text>
+                <text class="sub" x="540" y="103" text-anchor="middle">one process</text>
+              </svg>
+              <div class="dg-cap">Four message types, one seam, exactly two parties. That last part is the constraint.</div>
+            </div>
+
+            <p>Where it stops is where AHP starts. There's only ever one client in ACP's model, so the moment you want several viewers on one session you need something sitting in front of it.</p>
+          </section>
+
+          <section class="rd-section" id="rd-5">
+            <h2><span class="rd-num mono">05</span>AHP, the Agent Host Protocol</h2>
+            <p>AHP is the youngest of the four and the least deployed. Microsoft publishes it as an open spec, and its docs are blunt about the job: how a standalone sessions server talks to its clients, so that several of them can hold the same view of one session.</p>
+
+            <div class="dg">
+              <svg viewBox="0 0 620 200" role="img" aria-label="Several clients synchronised against one agent host, which speaks ACP downstream to a single agent.">
+                <defs>
+                  <marker id="a5" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+                    <path d="M0 1 L7 4 L0 7" fill="none" stroke="var(--gold)" stroke-width="1" />
+                  </marker>
+                </defs>
+
+                <rect class="node" x="14" y="26" width="112" height="32" />
+                <text class="sub" x="70" y="46" text-anchor="middle">PHONE</text>
+                <rect class="node" x="14" y="84" width="112" height="32" />
+                <text class="sub" x="70" y="104" text-anchor="middle">LAPTOP</text>
+                <rect class="node" x="14" y="142" width="112" height="32" />
+                <text class="sub" x="70" y="162" text-anchor="middle">CI JOB</text>
+
+                <path class="seam" d="M126 42 L206 42 L206 78 L242 78" fill="none" marker-end="url(#a5)" />
+                <line class="seam" x1="126" y1="100" x2="242" y2="100" marker-end="url(#a5)" />
+                <path class="seam" d="M126 158 L206 158 L206 122 L242 122" fill="none" marker-end="url(#a5)" />
+                <text class="gold" x="176" y="20" text-anchor="middle">AHP</text>
+
+                <rect class="tint" x="248" y="60" width="164" height="80" />
+                <rect class="node" x="248" y="60" width="164" height="80" />
+                <text class="lbl" x="330" y="94" text-anchor="middle">AGENT HOST</text>
+                <text class="sub" x="330" y="109" text-anchor="middle">holds the real state</text>
+
+                <line class="seam" x1="412" y1="100" x2="492" y2="100" marker-end="url(#a5)" />
+                <text class="gold" x="452" y="90" text-anchor="middle">ACP</text>
+
+                <rect class="node" x="498" y="76" width="108" height="48" />
+                <text class="lbl" x="552" y="105" text-anchor="middle">AGENT</text>
+              </svg>
+              <div class="dg-cap">The host is the authority. Clients subscribe to it; it speaks ACP onward to the agent.</div>
+            </div>
+
+            <p>The design borrows from frontend state management. Each session is a URI-addressed channel, the host keeps an immutable state tree per channel, and changes flow as ordered actions through reducers, so the server and every client compute the same result from the same stream. A client subscribes, gets a snapshot, then receives actions. It isn't a poll loop.</p>
+            <div class="rd-note">
+              <b>What AHP excludes</b>
+              Its own docs list it: no agent implementation, no model routing, no tool schema or registry, and no agent-to-agent coordination. It's a synchronization layer and nothing else.
+            </div>
+          </section>
+
+          <section class="rd-section" id="rd-6">
+            <h2><span class="rd-num mono">06</span>A2A, Agent2Agent</h2>
+            <p>A2A is the only one of the four where both ends are full agents rather than a client, a host or a tool. Google introduced it in 2025 and moved it to the Linux Foundation the same year. It reached v1.0 with more than 150 organizations involved in governance.</p>
+            <p>It exists separately from MCP because of what sits on the far end. An MCP tool is a known function with a schema: call it, get a typed result. A remote agent is autonomous, might run for minutes or hours, and has reasoning you can't see into. Treating that as a function call throws away the fact that the other side is making its own decisions.</p>
+
+            <div class="dg">
+              <svg viewBox="0 0 620 208" role="img" aria-label="Two independent agents, each opaque to the other, exchanging an agent card for discovery and a stateful task for work.">
+                <defs>
+                  <marker id="a6r" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+                    <path d="M0 1 L7 4 L0 7" fill="none" stroke="var(--gold)" stroke-width="1" />
+                  </marker>
+                  <pattern id="op6" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                    <line x1="0" y1="0" x2="0" y2="6" stroke="var(--line)" stroke-width="1" />
+                  </pattern>
+                </defs>
+
+                <rect class="node" x="14" y="34" width="166" height="118" />
+                <text class="lbl" x="97" y="56" text-anchor="middle">AGENT A</text>
+                <rect x="30" y="70" width="134" height="66" fill="url(#op6)" stroke="none" />
+                <rect class="zone" x="30" y="70" width="134" height="66" />
+                <text class="sub" x="97" y="99" text-anchor="middle">its own tools,</text>
+                <text class="sub" x="97" y="113" text-anchor="middle">its own reasoning</text>
+
+                <rect class="node" x="440" y="34" width="166" height="118" />
+                <text class="lbl" x="523" y="56" text-anchor="middle">AGENT B</text>
+                <rect x="456" y="70" width="134" height="66" fill="url(#op6)" stroke="none" />
+                <rect class="zone" x="456" y="70" width="134" height="66" />
+                <text class="sub" x="523" y="99" text-anchor="middle">opaque to A,</text>
+                <text class="sub" x="523" y="113" text-anchor="middle">and that's the point</text>
+
+                <line class="seam" x1="434" y1="62" x2="186" y2="62" marker-end="url(#a6r)" />
+                <text class="sub" x="310" y="56" text-anchor="middle">AGENT CARD: WHAT I CAN DO</text>
+
+                <line class="seam" x1="186" y1="104" x2="434" y2="104" marker-end="url(#a6r)" />
+                <text class="sub" x="310" y="98" text-anchor="middle">TASK: A UNIT OF WORK</text>
+
+                <text class="gold" x="310" y="140" text-anchor="middle">A2A</text>
+
+                <line class="flow" x1="186" y1="176" x2="434" y2="176" />
+                <circle cx="196" cy="176" r="2.5" fill="var(--muted)" />
+                <circle cx="279" cy="176" r="2.5" fill="var(--muted)" />
+                <circle cx="362" cy="176" r="2.5" fill="var(--muted)" />
+                <circle cx="424" cy="176" r="2.5" fill="var(--gold)" />
+                <text class="sub" x="196" y="194" text-anchor="middle">SUBMITTED</text>
+                <text class="sub" x="279" y="194" text-anchor="middle">WORKING</text>
+                <text class="sub" x="362" y="194" text-anchor="middle">INPUT-REQUIRED</text>
+                <text class="sub" x="424" y="194" text-anchor="middle">DONE</text>
+              </svg>
+              <div class="dg-cap">The hatching is the whole argument: neither side can see inside the other, and a task has a lifecycle rather than a return value.</div>
+            </div>
+
+            <p>MCP is for reaching into systems you already control. A2A is for handing work to a peer you don't.</p>
+          </section>
+
+          <section class="rd-section" id="rd-7">
+            <h2><span class="rd-num mono">07</span>MCP vs ACP vs AHP vs A2A</h2>
+            <p>Side by side, the differences in scope are sharper than any one project's documentation makes them look, because each spec is written as though it's the only protocol in the room.</p>
+            <div class="rd-table-wrap">
+              <table class="rd-table">
+                <caption>Four protocols, four boundaries. Not a ranking, a set of different jobs.</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Protocol</th>
+                    <th scope="col">Primary boundary</th>
+                    <th scope="col">Main purpose</th>
+                    <th scope="col">Typical participants</th>
+                    <th scope="col">Maturity</th>
+                    <th scope="col">What it is not</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="rd-protocol">MCP</td>
+                    <td>Agent to tools, data, APIs</td>
+                    <td>Standardize how an agent discovers and calls external tools, resources and prompts</td>
+                    <td>MCP Host (the app), MCP Client, MCP Server</td>
+                    <td>Established. Anthropic, Nov 2024. Linux Foundation since Dec 2025.</td>
+                    <td>Not an agent protocol. No sessions, no multi-client sync, no agent-to-agent.</td>
+                  </tr>
+                  <tr>
+                    <td class="rd-protocol">ACP</td>
+                    <td>Client (editor) to a single agent</td>
+                    <td>One client, one agent: prompts, streaming, tool calls, permissions</td>
+                    <td>An editor or IDE, and a coding agent</td>
+                    <td>Emerging. Zed, 2025. Stable v1 wire protocol, multi-vendor uptake.</td>
+                    <td>Not multi-client aware. Won't coordinate several viewers of one session.</td>
+                  </tr>
+                  <tr>
+                    <td class="rd-protocol">AHP</td>
+                    <td>Several clients to one shared session host</td>
+                    <td>Keep N clients in sync against one authoritative session</td>
+                    <td>Multiple clients, an Agent Host, ACP downstream</td>
+                    <td>Experimental. Microsoft, single-vendor origin, least deployed of the four.</td>
+                    <td>Not agent implementation, tool schema, model routing or agent-to-agent.</td>
+                  </tr>
+                  <tr>
+                    <td class="rd-protocol">A2A</td>
+                    <td>Agent to an independent agent</td>
+                    <td>Discover and delegate stateful work to a peer you don't control</td>
+                    <td>Two independent runtimes, often different vendors</td>
+                    <td>Emerging. Google, 2025. Linux Foundation, v1.0, 150+ organizations.</td>
+                    <td>Not tool calling. Not for deterministic, stateless functions.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="rd-section" id="rd-8">
+            <h2><span class="rd-num mono">08</span>How they can fit together</h2>
+            <p>One way to read the four boundaries as a single stack, human at the top, capabilities at the bottom. <strong style="color:var(--bone)">This is my reading of how the pieces compose, not an official architecture.</strong> None of the four specs describe themselves as part of a combined stack.</p>
+
+            <div class="dg">
+              <svg viewBox="0 0 620 348" role="img" aria-label="A vertical stack: human, client, AHP, agent host, ACP, agent, MCP, then tools, data and APIs. Separately, two agents linked by A2A.">
+                <text class="sub" x="310" y="14" text-anchor="middle">HUMAN</text>
+                <line class="flow" x1="310" y1="22" x2="310" y2="36" />
+
+                <rect class="node" x="230" y="36" width="160" height="34" />
+                <text class="lbl" x="310" y="57" text-anchor="middle">CLIENT</text>
+
+                <line class="seam" x1="310" y1="70" x2="310" y2="100" />
+                <text class="gold" x="322" y="89">AHP</text>
+
+                <rect class="node" x="230" y="100" width="160" height="34" />
+                <text class="lbl" x="310" y="121" text-anchor="middle">AGENT HOST</text>
+
+                <line class="seam" x1="310" y1="134" x2="310" y2="164" />
+                <text class="gold" x="322" y="153">ACP</text>
+
+                <rect class="tint" x="230" y="164" width="160" height="34" />
+                <rect class="node" x="230" y="164" width="160" height="34" />
+                <text class="lbl" x="310" y="185" text-anchor="middle">AGENT</text>
+
+                <line class="seam" x1="310" y1="198" x2="310" y2="222" />
+                <text class="gold" x="322" y="214">MCP</text>
+
+                <path class="flow" d="M185 222 L435 222" />
+                <line class="flow" x1="185" y1="222" x2="185" y2="240" />
+                <line class="flow" x1="310" y1="222" x2="310" y2="240" />
+                <line class="flow" x1="435" y1="222" x2="435" y2="240" />
+
+                <rect class="node" x="120" y="240" width="130" height="32" />
+                <text class="sub" x="185" y="260" text-anchor="middle">TOOLS</text>
+                <rect class="node" x="262" y="240" width="96" height="32" />
+                <text class="sub" x="310" y="260" text-anchor="middle">DATA</text>
+                <rect class="node" x="370" y="240" width="130" height="32" />
+                <text class="sub" x="435" y="260" text-anchor="middle">APIS</text>
+
+                <line class="zone" x1="20" y1="296" x2="600" y2="296" />
+                <text class="sub" x="20" y="288">SEPARATELY, IF YOU EVER NEED IT</text>
+
+                <rect class="node" x="120" y="310" width="130" height="32" />
+                <text class="sub" x="185" y="330" text-anchor="middle">AGENT A</text>
+                <line class="seam" x1="250" y1="326" x2="370" y2="326" />
+                <text class="gold" x="310" y="320" text-anchor="middle">A2A</text>
+                <rect class="node" x="370" y="310" width="130" height="32" />
+                <text class="sub" x="435" y="330" text-anchor="middle">AGENT B</text>
+              </svg>
+              <div class="dg-cap">A place to locate a boundary you're building against, not a bill of materials.</div>
+            </div>
+
+            <p>Most real systems don't instantiate every layer. Plenty of production agents skip AHP because they only ever have one client, and skip A2A because they never delegate outside themselves.</p>
+          </section>
+
+          <section class="rd-section" id="rd-9">
+            <h2><span class="rd-num mono">09</span>What this means for builders</h2>
+            <p>If you're building a single-tenant agent, say a React frontend against your own backend with something like LangGraph doing the reasoning, you probably need one of these four and can ignore the other three for a long time.</p>
+
+            <div class="dg">
+              <svg viewBox="0 0 620 236" role="img" aria-label="The common case needs only MCP: a frontend, a backend, a runtime and tools. ACP, AHP and A2A are shown dimmed as not yet needed.">
+                <defs>
+                  <marker id="a9" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+                    <path d="M0 1 L7 4 L0 7" fill="none" stroke="var(--muted)" stroke-width="1" />
+                  </marker>
+                </defs>
+
+                <text class="sub" x="20" y="14">WHAT YOU ACTUALLY NEED</text>
+
+                <rect class="node" x="20" y="26" width="230" height="32" />
+                <text class="sub" x="135" y="46" text-anchor="middle">REACT FRONTEND</text>
+                <line class="flow" x1="135" y1="58" x2="135" y2="76" marker-end="url(#a9)" />
+
+                <rect class="node" x="20" y="80" width="230" height="32" />
+                <text class="sub" x="135" y="100" text-anchor="middle">YOUR BACKEND</text>
+                <line class="flow" x1="135" y1="112" x2="135" y2="130" marker-end="url(#a9)" />
+
+                <rect class="node" x="20" y="134" width="230" height="32" />
+                <text class="sub" x="135" y="154" text-anchor="middle">AGENT RUNTIME</text>
+
+                <line class="seam" x1="135" y1="166" x2="135" y2="192" />
+                <text class="gold" x="147" y="183">MCP</text>
+
+                <rect class="tint" x="20" y="192" width="230" height="32" />
+                <rect class="node" x="20" y="192" width="230" height="32" />
+                <text class="sub" x="135" y="212" text-anchor="middle">TOOLS</text>
+
+                <line class="zone" x1="300" y1="10" x2="300" y2="224" />
+
+                <g class="dim">
+                  <text class="sub" x="330" y="14">NOT YET</text>
+
+                  <rect class="node" x="330" y="26" width="270" height="52" />
+                  <text class="lbl" x="346" y="46">ACP</text>
+                  <text class="sub" x="346" y="63">you aren't building an editor</text>
+
+                  <rect class="node" x="330" y="92" width="270" height="52" />
+                  <text class="lbl" x="346" y="112">AHP</text>
+                  <text class="sub" x="346" y="129">only one client is ever watching</text>
+
+                  <rect class="node" x="330" y="158" width="270" height="52" />
+                  <text class="lbl" x="346" y="178">A2A</text>
+                  <text class="sub" x="346" y="195">no outside agent to hand work to</text>
+                </g>
+              </svg>
+              <div class="dg-cap">Three of the four are solving problems this system doesn't have yet.</div>
+            </div>
+
+            <p><strong style="color:var(--bone)">MCP is the one that pays for itself early.</strong> It turns "write a custom integration per tool" into "write one server per tool, reusable across everything you build afterwards". I'd reach for it as soon as an agent has to touch more than one external system.</p>
+            <p>The other three are narrower than their names suggest. ACP matters when you're building the editor or the agent but not both. AHP matters once a session genuinely needs watching from more than one place, a phone and a laptop sharing state, or a background job observing. A2A is the easiest to over-apply: an orchestrator calling its own sub-agents in-process doesn't need a wire protocol for it, a function call is fine.</p>
+            <p>The rule that falls out of that: adopt a protocol when the boundary it covers becomes a real boundary in your deployment, a process, an org or a trust boundary. Not because a reference architecture includes it.</p>
+          </section>
+
+          <section class="rd-section" id="rd-10">
+            <h2><span class="rd-num mono">10</span>What is still unclear</h2>
+            <p>None of this is settled, and treating it as settled would be the wrong read. Four things I'd flag:</p>
+            <ul>
+              <li><strong style="color:var(--bone)">They weren't designed together.</strong> Four companies, four timelines, four immediate problems. That they compose as neatly as section 08 suggests is luck more than intent, and nothing keeps them compatible as each one moves.</li>
+              <li><strong style="color:var(--bone)">AHP has the least validation.</strong> The ideas are borrowed from mature patterns, but as a protocol for agent sessions it's young and single-vendor, and it isn't clear yet whether the ecosystem lands on it, on a rival, or on ad hoc solutions per framework.</li>
+              <li><strong style="color:var(--bone)">The overlap is real.</strong> A2A's task lifecycle and MCP's extension for long-running tool calls solve adjacent problems from opposite directions, and the line between them keeps moving.</li>
+              <li><strong style="color:var(--bone)">"Agent" is doing too much work as a word.</strong> An MCP host, an ACP agent, an AHP session and an A2A peer are not the same shape of thing, and the vocabulary hasn't caught up.</li>
+            </ul>
+          </section>
+
+          <section class="rd-section" id="rd-11">
+            <h2><span class="rd-num mono">11</span>Conclusion</h2>
+            <p>The interesting part isn't that agents have protocols now. It's that four of them formed independently, around four different boundaries, with no central coordination, and mostly landed on compatible shapes anyway.</p>
+            <p>Which also means the stack in section 08 probably won't look like that in a year. Some of these will merge or get absorbed, and boundaries that don't have names yet will get them. The habit is more durable than the diagram: ask which boundary you're standing on before reaching for a protocol built for a different one.</p>
+          </section>
+
+        </div>
+      </article>
+    </main>
+
+    <footer class="essay-foot mono">
+      <a href="/#writing-top">← Back to Writing</a>
+      <span>Pranav Tharoor, August 2026</span>
+    </footer>
+
+    <!-- WATCH — a lightbox overlay around the rendered film. Hidden by
+         default; opened by the CTA in the essay head. -->
+    <div class="watch" id="watch" hidden>
+      <video class="watch-video" id="watch-video" src="video/protocol-stack.mp4" controls playsinline></video>
+      <button type="button" class="watch-close" data-watch-close aria-label="Close film">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M6 6l12 12M18 6 6 18" /></svg>
+      </button>
+    </div>
+
+    <script>
+      (function () {
+        "use strict";
+
+        /* ---------- Theme toggle ---------- */
+        /* The blocking script in <head> already stamped data-theme if a
+           choice was stored; this just wires the button and keeps it
+           honest about which theme is actually showing. Identical logic
+           to index.html's copy. */
+        (function () {
+          var btn = document.querySelector("[data-theme-toggle]");
+          if (!btn) return;
+          var media = window.matchMedia("(prefers-color-scheme: light)");
+
+          function effective() {
+            var stored = document.documentElement.dataset.theme;
+            if (stored === "light" || stored === "dark") return stored;
+            return media.matches ? "light" : "dark";
+          }
+          function setLabel() {
+            var next = effective() === "light" ? "dark" : "light";
+            btn.setAttribute("aria-label", "Switch to " + next + " theme");
+          }
+          setLabel();
+
+          btn.addEventListener("click", function () {
+            var next = effective() === "light" ? "dark" : "light";
+            document.documentElement.dataset.theme = next;
+            try {
+              localStorage.setItem("theme", next);
+            } catch (e) {}
+            setLabel();
+          });
+
+          media.addEventListener("change", function () {
+            if (!document.documentElement.dataset.theme) setLabel();
+          });
+        })();
+
+        /* ---------- ArticleProgress ---------- */
+        var fill = document.querySelector("[data-progress-fill]");
+        function updateProgress() {
+          if (!fill) return;
+          var doc = document.documentElement;
+          var total = doc.scrollHeight - window.innerHeight;
+          var pct = total > 0 ? Math.min(1, Math.max(0, window.scrollY / total)) : 0;
+          fill.style.transform = "scaleX(" + pct.toFixed(4) + ")";
+        }
+        var ticking = false;
+        window.addEventListener("scroll", function () {
+          if (!ticking) { requestAnimationFrame(function () { updateProgress(); ticking = false; }); ticking = true; }
+        }, { passive: true });
+        window.addEventListener("resize", updateProgress, { passive: true });
+        updateProgress();
+
+        /* ---------- WATCH — video lightbox ---------- */
+        var watch = document.getElementById("watch");
+        var video = document.getElementById("watch-video");
+        var lastFocused = null;
+
+        function openWatch() {
+          lastFocused = document.activeElement;
+          watch.hidden = false;
+          document.body.style.overflow = "hidden";
+          video.currentTime = 0;
+          video.play();
+        }
+        function closeWatch() {
+          video.pause();
+          watch.hidden = true;
+          document.body.style.overflow = "";
+          if (lastFocused && typeof lastFocused.focus === "function") lastFocused.focus();
+        }
+
+        document.querySelector("[data-watch-open]").addEventListener("click", openWatch);
+        watch.querySelectorAll("[data-watch-close]").forEach(function (b) { b.addEventListener("click", closeWatch); });
+        document.addEventListener("keydown", function (e) {
+          if (!watch.hidden && e.key === "Escape") closeWatch();
+        });
+      })();
+    </script>
+  </body>
+</html>

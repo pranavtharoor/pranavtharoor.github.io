@@ -572,9 +572,9 @@
         { src: "/img/otc-coldplay.jpg",                                          place: "Navi Mumbai", year: "2025" },
         { src: "/img/otc-jatayu-poster.jpg",     clip: "/img/otc-jatayu.mp4",     place: "Jatayu",      year: "2025" },
         { src: "/img/otc-halloween.jpg",                                         place: "Home",        year: "2022" },
-        { src: "/img/otc-maravanthe.jpg",                                        place: "Maravanthe",  year: "2023" },
+        { src: "/img/otc-maravanthe.jpg",   depth: 1.15,                         place: "Maravanthe",  year: "2023" },
         { src: "/img/otc-edsheeran-poster.jpg",  clip: "/img/otc-edsheeran.mp4",  place: "Mumbai",      year: "2024" },
-        { src: "/img/otc-batur.jpg",                                             place: "Mount Batur", year: "2024" }
+        { src: "/img/otc-batur.jpg",        depth: 1.15, depthMap: "/img/otc-batur-depth.png",                         place: "Mount Batur", year: "2024" }
       ];
 
       const canvas = document.getElementById("gl");
@@ -702,14 +702,58 @@
          rest" idea as the strip, but spatial.
          —————————————————————————————————————————————— */
       const GAP = 7.5;
+      // Depth displacement, no ML model involved. Two cues do the work:
+      //   · aerial perspective — haze lightens things with distance, so
+      //     brighter means further away in a landscape
+      //   · the ground is at the bottom of the frame
+      // Blurred over five taps, because raw luminance is noisy and an
+      // unfiltered depth map turns the surface to gravel. Only applies to
+      // items that opt in with a `depth` value; everything else stays flat.
       const planeVert = `
-        uniform float uCurve;
+        uniform sampler2D uTex, uDepthTex;
+        uniform float uCurve, uDepth, uHasDepthMap;
         varying vec2 vUv;
         varying float vZ;
+
+        float lumAt(vec2 c) {
+          vec3 s = texture2D(uTex, clamp(c, 0.001, 0.999)).rgb;
+          return dot(s, vec3(0.299, 0.587, 0.114));
+        }
+
         void main() {
           vUv = uv;
           vec3 p = position;
           p.z += sin(uv.x * 3.14159265) * uCurve;
+
+          if (uDepth > 0.0) {
+            float far;
+            if (uHasDepthMap > 0.5) {
+              // A real monocular depth map. White is near, black is far, so
+              // invert. Barely blurred — this one already has clean edges, and
+              // the sharp ridge is the whole point: it is what produces
+              // occlusion, which the luminance heuristic could never give.
+              float o = 0.004;
+              float d = (
+                texture2D(uDepthTex, uv).r +
+                texture2D(uDepthTex, clamp(uv + vec2(o, 0.0), 0.002, 0.998)).r +
+                texture2D(uDepthTex, clamp(uv - vec2(o, 0.0), 0.002, 0.998)).r +
+                texture2D(uDepthTex, clamp(uv + vec2(0.0, o), 0.002, 0.998)).r +
+                texture2D(uDepthTex, clamp(uv - vec2(0.0, o), 0.002, 0.998)).r
+              ) * 0.2;
+              far = 1.0 - d;
+            } else {
+              // fallback: aerial perspective + the ground being at the bottom
+              float o = 0.018;
+              float lum = (
+                lumAt(uv) +
+                lumAt(uv + vec2(o, 0.0)) + lumAt(uv - vec2(o, 0.0)) +
+                lumAt(uv + vec2(0.0, o)) + lumAt(uv - vec2(0.0, o))
+              ) * 0.2;
+              far = smoothstep(0.05, 0.95, clamp(0.55 * uv.y + 0.45 * lum, 0.0, 1.0));
+            }
+            p.z -= far * uDepth;
+          }
+
           vec4 mv = modelViewMatrix * vec4(p, 1.0);
           vZ = -mv.z;
           gl_Position = projectionMatrix * mv;
@@ -734,8 +778,12 @@
           // ones still approaching are desaturated and dimmed, the same
           // "desaturated at rest" idea as the standard site's strip.
           float l = dot(col, vec3(0.299, 0.587, 0.114));
-          col = mix(vec3(l) * 0.92, col, mix(0.50, 1.0, uFocus));
-          col *= mix(0.34, 0.92, uFocus);
+          col = mix(vec3(l) * 0.92, col, mix(0.62, 1.0, uFocus));
+          // The floor used to be 0.34, which was fine for bright images and
+          // crushed the already-dark ones — Home, Navi Mumbai, Mumbai — into
+          // black rectangles that read as holes in the scene rather than as
+          // photographs waiting their turn.
+          col *= mix(0.58, 0.95, uFocus);
 
           // feathered edge — no hard rectangle anywhere
           float e = min(min(uv.x, 1.0 - uv.x), min(uv.y, 1.0 - uv.y));
@@ -778,6 +826,9 @@
             uTex: { value: tex },
             uFocus: { value: 0 },
             uReveal: { value: 0 },
+            uDepth: { value: item.depth || 0 },
+            uDepthTex: { value: null },
+            uHasDepthMap: { value: 0 },
             uFogNear: { value: 14 },
             uFogFar: { value: 34 },
             uFog: { value: new THREE.Color("#08080a") }
@@ -787,7 +838,10 @@
         });
 
         // 3:4 portrait, alternating sides, drifting off-axis for asymmetry
-        const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 3.2, 24, 24), mat);
+        // a displaced surface needs vertices to displace; flat ones do not
+        const segX = item.depth ? 150 : 24;
+        const segY = item.depth ? 200 : 24;
+        const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 3.2, segX, segY), mat);
         const side = i % 2 === 0 ? -1 : 1;
         mesh.position.set(
           side * (1.05 + (i % 3) * 0.16),
@@ -799,7 +853,18 @@
         mat.uniforms.uCurve = { value: 0.22 };
         scene.add(mesh);
 
-        const entry = { mesh, mat, item, index: i, vid: null, swapped: false };
+        const entry = { mesh, mat, item, index: i, vid: null, swapped: false,
+                        baseRotY: mesh.rotation.y, baseRotX: 0 };
+
+        if (item.depthMap) {
+          // no colorSpace conversion — this is data, not a picture
+          const dt = loader.load(item.depthMap, () => {
+            mat.uniforms.uHasDepthMap.value = 1;
+          });
+          dt.minFilter = THREE.LinearFilter;
+          dt.magFilter = THREE.LinearFilter;
+          mat.uniforms.uDepthTex.value = dt;
+        }
 
         // Clips start as their poster and swap to a VideoTexture once the
         // video can actually play, so a blocked or slow video never leaves a
@@ -938,10 +1003,10 @@
         camera.position.z = 3.4 + eased * (CORRIDOR_END - 6 - 3.4);
 
         // parallax — the frame breathes with the cursor
-        const px = (pointer.x - 0.5) * 0.7;
-        const py = (pointer.y - 0.5) * 0.4;
-        camera.position.x += (px - camera.position.x) * 0.04;
-        camera.position.y += (-py - camera.position.y) * 0.04;
+        const px = (pointer.x - 0.5) * 1.15;
+        const py = (pointer.y - 0.5) * 0.62;
+        camera.position.x += (px - camera.position.x) * 0.09;
+        camera.position.y += (-py - camera.position.y) * 0.09;
         camera.lookAt(camera.position.x * 0.35, camera.position.y * 0.35, camera.position.z - 10);
 
         // ——— hero fade ———
@@ -985,6 +1050,15 @@
           if (d < bestD) { bestD = d; best = pl.index; }
           // slow drift so nothing feels pinned
           pl.mesh.rotation.z += Math.sin(t * 0.25 + pl.index) * 0.00008;
+
+          // Camera parallax alone moved near and far points almost equally —
+          // 11px of differential, invisible. Tilting the relief itself is the
+          // lever that actually reads, and only while it is in focus.
+          if (pl.item.depth) {
+            var fo = pl.mat.uniforms.uFocus.value;
+            pl.mesh.rotation.y = pl.baseRotY + (pointer.x - 0.5) * 0.34 * fo;
+            pl.mesh.rotation.x = pl.baseRotX + (pointer.y - 0.5) * 0.18 * fo;
+          }
 
           // clips run only while they are the one you are looking at
           if (pl.vid) {
