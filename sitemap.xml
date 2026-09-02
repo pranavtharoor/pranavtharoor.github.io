@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- /surface and /404 are deliberately excluded — both carry their own
+<!-- /404 is deliberately excluded — it carries its own
      <meta name="robots" content="noindex">, and a sitemap entry for a
      noindex page is a contradiction crawlers flag as an error. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
