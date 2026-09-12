@@ -851,9 +851,6 @@
         line-height: 1;
         letter-spacing: -0.01em;
       }
-      .sec-idx {
-        color: var(--gold);
-      }
 
       /* ————— STATEMENT / ABOUT ————— */
       #about {
@@ -1392,9 +1389,6 @@
         color: var(--muted);
         margin-bottom: 2rem;
       }
-      .contact-kicker .sec-idx {
-        color: var(--gold);
-      }
       .contact-giant {
         font-family: var(--serif);
         font-weight: 360;
@@ -1719,9 +1713,6 @@
         .hero-video,
         .foot-bar,
         .contact-giant .arrow,
-        /* the numbering is a screen device, and hiding Off the Clock would
-           leave it reading 01, 02, 05 on paper */
-        .sec-idx,
         .contact-kicker {
           display: none !important;
         }
@@ -1779,7 +1770,6 @@
         }
         .hero-role em,
         .statement-lead em,
-        .sec-idx,
         .cap h4,
         .contact-giant em,
         .job-idx {
@@ -2055,7 +2045,6 @@
     <section id="experience">
       <div class="sec-head" data-reveal>
         <h2 class="sec-title">Experience</h2>
-        <span class="sec-idx mono">( 01 )</span>
       </div>
       <ol class="jobs">
         <li class="job" data-reveal>
@@ -2224,7 +2213,6 @@
                header+list actually render. -->
           <div class="sec-head" id="writing-top" data-reveal>
             <h2 class="sec-title">Writing</h2>
-            <span class="sec-idx mono">( 03 )</span>
           </div>
           <!-- data-reveal belongs on the strip, not the cards — same as
                .otc-strip. On a card it never fires for anything off the right
@@ -2258,7 +2246,6 @@
     <section id="offtheclock">
       <div class="sec-head" data-reveal>
         <h2 class="sec-title">Off the Clock</h2>
-        <span class="sec-idx mono">( 04 )</span>
       </div>
       <!-- Items are built from the OFF_THE_CLOCK list in the script below. -->
       <div class="otc-strip" data-reveal></div>
@@ -2266,9 +2253,7 @@
 
     <!-- CONTACT -->
     <footer id="contact">
-      <p class="contact-kicker mono" data-reveal>
-        <span class="sec-idx">( 05 )</span> - Get in touch
-      </p>
+      <p class="contact-kicker mono" data-reveal>Get in touch</p>
       <a
         class="contact-giant"
         href="mailto:pranav.tharoor@gmail.com"
@@ -2333,14 +2318,6 @@
           var link = document.querySelector(".nav-writing");
           if (link) link.remove();
         }
-
-        // Numbered from the DOM rather than trusted from the markup, so
-        // flipping the flag cannot leave the rest reading 01, 02, 04, 05.
-        // This also retires the standing trap of having to renumber by hand
-        // every time a section is added or moved.
-        document.querySelectorAll(".sec-idx").forEach(function (el, i) {
-          el.textContent = "( " + String(i + 1).padStart(2, "0") + " )";
-        });
       })();
 
       // Autoplay — mobile Safari/Chrome defer or block play() in several
