@@ -894,7 +894,12 @@
       }
       .job {
         display: grid;
-        grid-template-columns: 3.5rem 1.15fr 1.35fr auto;
+        /* Each <li> is its own grid, so an "auto" last column sizes to that
+           row's own date text. Every date used to read "Mmm YYYY -> Mmm
+           YYYY" (always 19 characters), so they all happened to land on the
+           same width - fixing it in ch (the date is .mono, genuinely
+           monospace) keeps that alignment for any date text, long or short. */
+        grid-template-columns: 3.5rem 1.15fr 1.35fr 19ch;
         gap: 2.5rem;
         align-items: baseline;
         padding: 2.6rem 0;
@@ -2065,6 +2070,25 @@
         <li class="job" data-reveal>
           <span class="job-idx mono">03</span>
           <div>
+            <h3 class="job-role">Apache Zeppelin</h3>
+            <span class="job-co mono"
+              ><a
+                href="https://zeppelin.apache.org/releases/zeppelin-release-0.10.1"
+                target="_blank"
+                rel="noopener"
+                >Open-source Contributor</a
+              ></span
+            >
+          </div>
+          <p class="job-desc">
+            Contributed improvements to Zeppelin's notebook UI, including its
+            sidebar and table-of-contents experience.
+          </p>
+          <span class="job-date mono">Feb 2022</span>
+        </li>
+        <li class="job" data-reveal>
+          <span class="job-idx mono">04</span>
+          <div>
             <h3 class="job-role">
               <a
                 href="https://summerofcode.withgoogle.com/archive/2019/projects/6479427641278464"
@@ -2090,7 +2114,7 @@
           <span class="job-date mono">May 2019 → Aug 2019</span>
         </li>
         <li class="job" data-reveal>
-          <span class="job-idx mono">04</span>
+          <span class="job-idx mono">05</span>
           <div>
             <h3 class="job-role">Web Developer Intern</h3>
             <span class="job-co mono">Praktice.ai</span>
