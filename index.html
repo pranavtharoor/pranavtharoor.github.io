@@ -1615,11 +1615,21 @@
       /* ————— RESPONSIVE ————— */
       @media (max-width: 900px) {
         .job {
-          grid-template-columns: 3rem 1fr auto;
+          grid-template-columns: 3rem 1fr 19ch;
           gap: 1.25rem 1.5rem;
         }
         .job-desc {
           grid-column: 2 / -1;
+        }
+        /* job-desc spanning columns 2-3 pushes the auto-placement cursor past
+           row 1's 3rd cell, so job-date (next in DOM order, no explicit
+           placement) skips it and lands in row 3 col 1 instead — the idx
+           column, 3rem wide, where a full date string has nowhere to go but
+           off the left edge. Pin it back to where it visually belongs: next
+           to the role, on the row above the description. */
+        .job-date {
+          grid-row: 1;
+          grid-column: 3;
         }
         .caps {
           grid-template-columns: repeat(2, 1fr);
@@ -1661,6 +1671,14 @@
         }
         .job-desc {
           grid-column: 1 / -1;
+        }
+        /* Only 2 columns here, so the 900px fix above (row 1, col 3) no
+           longer exists — cancel it back to auto-placement, which already
+           puts the date on its own line under the description and reads
+           fine at this width. */
+        .job-date {
+          grid-row: auto;
+          grid-column: 1;
         }
         .caps {
           grid-template-columns: 1fr;
