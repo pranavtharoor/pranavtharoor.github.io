@@ -1402,6 +1402,14 @@
       .contact-giant em {
         font-weight: 340;
         transition: color 0.3s ease;
+        /* Safari has been seen leaving a sliver of the old colour unpainted
+           at fine stroke intersections (the k's diagonal meeting its stem)
+           when this transition fires - a stale-raster repaint quirk, not a
+           clipping bug: computed style is uniformly gold throughout. Forcing
+           its own compositing layer makes it redraw in full on every frame
+           instead of patching a cached glyph mask. */
+        transform: translateZ(0);
+        backface-visibility: hidden;
       }
       .contact-giant .arrow {
         display: inline-block;
