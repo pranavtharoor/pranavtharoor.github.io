@@ -916,6 +916,26 @@
         margin-top: 0.55rem;
         color: var(--muted);
       }
+      /* Same underline-draw as .contact-links a, reused here for the one job
+         with somewhere to send you: the official listing and the org's own
+         thank-you page. currentColor keeps it right in both themes without
+         a separate override. */
+      .job-role a,
+      .job-co a {
+        color: inherit;
+        text-decoration: none;
+        padding-bottom: 2px;
+        background-image: linear-gradient(currentColor, currentColor);
+        background-size: 0% 1px;
+        background-position: left bottom;
+        background-repeat: no-repeat;
+        transition: background-size 0.35s var(--ease), color 0.2s ease;
+      }
+      .job-role a:hover,
+      .job-co a:hover {
+        color: var(--gold);
+        background-size: 100% 1px;
+      }
       .job-desc {
         color: var(--muted);
         font-size: 0.97rem;
@@ -2045,9 +2065,21 @@
         <li class="job" data-reveal>
           <span class="job-idx mono">03</span>
           <div>
-            <h3 class="job-role">Google Summer of Code</h3>
+            <h3 class="job-role">
+              <a
+                href="https://summerofcode.withgoogle.com/archive/2019/projects/6479427641278464"
+                target="_blank"
+                rel="noopener"
+                >Google Summer of Code</a
+              >
+            </h3>
             <span class="job-co mono"
-              >Canadian Centre for Computational Genomics</span
+              ><a
+                href="https://computationalgenomics.ca/gsoc-2019/"
+                target="_blank"
+                rel="noopener"
+                >Canadian Centre for Computational Genomics</a
+              ></span
             >
           </div>
           <p class="job-desc">
