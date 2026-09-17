@@ -1,38 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Pranav Tharoor">
-  <!-- Serif P on the site's ink ground, mirroring the hero masthead:
-       bone type on near-black, no rounded corners, no gradient.
-
-       The letterform is drawn as a path rather than set in Fraunces for
-       two reasons: SVG favicons do not load webfonts, so a font-family
-       would silently fall back to whatever the OS has; and Fraunces is a
-       high-contrast display face whose thin strokes disappear entirely at
-       16px. This is the same skeleton with the contrast pulled in — the
-       bowl's thin strokes are 2.35 units against a 3.1 thick and a 3.7
-       stem, with 2.2-unit serifs — so the shape survives a favicon slot
-       instead of turning to mush. Numbers are in the 32-unit viewBox, so
-       halve them for the 16px case: the thinnest stroke is still ~1.2px.
-       Anything more elegant than this disappears. -->
-  <rect width="32" height="32" fill="#0d0d0f"/>
-  <path fill="#eae7e1" fill-rule="evenodd" d="
-    M 9.4 7
-    L 17.6 7
-    C 20.64 7 23.1 9.19 23.1 11.9
-    C 23.1 14.61 20.64 16.8 17.6 16.8
-    L 16.1 16.8
-    L 16.1 22.8
-    L 19.3 22.8
-    L 19.3 25
-    L 9.2 25
-    L 9.2 22.8
-    L 12.4 22.8
-    L 12.4 9.2
-    L 9.4 9.2
-    Z
-    M 16.1 9.35
-    L 17.3 9.35
-    C 18.79 9.35 20 10.49 20 11.9
-    C 20 13.31 18.79 14.45 17.3 14.45
-    L 16.1 14.45
-    Z
-  "/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-label="Pranav Tharoor">
+  <!-- TP monogram badge, supplied as finished artwork, not drawn as a path
+       like the previous serif-P mark. Embedded as a raster data URI rather
+       than traced to vector, since tracing the ring's antialiased edge and
+       the overlapping serif strokes would have meant redrawing the design,
+       not just converting its format. Palette-quantized to 64 colours: this
+       is flat regions plus soft edges, not a photo, so it loses nothing
+       visible and drops from roughly 200KB to a few KB, which matters here
+       since /favicon.svg loads on every page. Kept as one <image> so the
+       existing href in every page keeps resolving. -->
+  <image width="160" height="160" href="data:image/png;base64,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"/>
 </svg>
