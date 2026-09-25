@@ -421,23 +421,15 @@
         border-bottom: 1px solid var(--line);
         padding: 0 0 1.6rem;
       }
-      .rd-toc ol { list-style: none; counter-reset: toc; columns: 2; column-gap: 2rem; }
-      .rd-toc li { counter-increment: toc; margin-bottom: 0.55rem; break-inside: avoid; }
+      .rd-toc ol { list-style: none; columns: 2; column-gap: 2rem; }
+      .rd-toc li { margin-bottom: 0.55rem; break-inside: avoid; }
       .rd-toc a {
-        display: flex;
-        gap: 0.6rem;
         text-decoration: none;
         color: var(--muted);
         font-size: 0.88rem;
         transition: color 0.2s ease;
       }
       .rd-toc a:hover { color: var(--bone); }
-      .rd-toc a::before {
-        content: counter(toc, decimal-leading-zero);
-        font-family: var(--mono);
-        color: var(--gold);
-        flex: none;
-      }
 
       .rd-section { padding: 6vh 0; border-top: 1px solid var(--line); }
       .rd-section:first-of-type { border-top: none; padding-top: 0; }
@@ -448,7 +440,6 @@
         line-height: 1.1;
         letter-spacing: -0.005em;
       }
-      .rd-section h2 .rd-num { color: var(--gold); font-family: var(--mono); font-size: 0.9rem; display: block; margin-bottom: 0.8rem; }
       .rd-section h3 {
         margin-top: 2.2rem;
         font-family: var(--serif);
@@ -684,14 +675,14 @@
           </nav>
 
           <section class="rd-section" id="rd-1">
-            <h2><span class="rd-num mono">01</span>Introduction</h2>
+            <h2>Introduction</h2>
             <p class="rd-lede">Four protocols have appeared around AI agents in about eighteen months: MCP, ACP, AHP and A2A. They come from four different companies, and none of the specs reference the other three.</p>
             <p>What I find interesting is that they aren't competing. Each one claims a different seam inside the same kind of system, and the seams barely overlap.</p>
             <p>Accurate as of August 2026. All four are moving quickly, so check the source specs before you build against any of them.</p>
           </section>
 
           <section class="rd-section" id="rd-2">
-            <h2><span class="rd-num mono">02</span>The problem with treating "the agent" as one thing</h2>
+            <h2>The problem with treating "the agent" as one thing</h2>
             <p>Most agent products are one process. A server renders a chat UI, holds the conversation, calls a model, and runs tool calls in the same request handler. That's a fine way to build the first version, and it's why the internal seams stay invisible until you have to cross one.</p>
             <p>Pull them apart and there are five roles doing different jobs.</p>
 
@@ -732,7 +723,7 @@
           </section>
 
           <section class="rd-section" id="rd-3">
-            <h2><span class="rd-num mono">03</span>MCP, the Model Context Protocol</h2>
+            <h2>MCP, the Model Context Protocol</h2>
             <p>MCP covers the boundary between a runtime and anything it can read or act on. Anthropic published it in November 2024 and handed governance to the Linux Foundation a year later. It's the closest thing here to a settled standard.</p>
             <p>The vocabulary trips people up, so it's worth drawing. The Host is the application itself. It creates one Client per Server, a dedicated connection each.</p>
 
@@ -777,7 +768,7 @@
           </section>
 
           <section class="rd-section" id="rd-4">
-            <h2><span class="rd-num mono">04</span>ACP, the Agent Client Protocol</h2>
+            <h2>ACP, the Agent Client Protocol</h2>
             <p>ACP covers one client talking to one agent, and it was designed with code editors in mind. Zed released it in 2025; JetBrains and a long list of agents have picked it up since, which means an editor and an agent no longer need a custom integration per pair.</p>
 
             <div class="dg">
@@ -822,7 +813,7 @@
           </section>
 
           <section class="rd-section" id="rd-5">
-            <h2><span class="rd-num mono">05</span>AHP, the Agent Host Protocol</h2>
+            <h2>AHP, the Agent Host Protocol</h2>
             <p>AHP is the youngest of the four and the least deployed. Microsoft publishes it as an open spec, and its docs are blunt about the job: how a standalone sessions server talks to its clients, so that several of them can hold the same view of one session.</p>
 
             <div class="dg">
@@ -867,7 +858,7 @@
           </section>
 
           <section class="rd-section" id="rd-6">
-            <h2><span class="rd-num mono">06</span>A2A, Agent2Agent</h2>
+            <h2>A2A, Agent2Agent</h2>
             <p>A2A is the only one of the four where both ends are full agents rather than a client, a host or a tool. Google introduced it in 2025 and moved it to the Linux Foundation the same year. It reached v1.0 with more than 150 organizations involved in governance.</p>
             <p>It exists separately from MCP because of what sits on the far end. An MCP tool is a known function with a schema: call it, get a typed result. A remote agent is autonomous, might run for minutes or hours, and has reasoning you can't see into. Treating that as a function call throws away the fact that the other side is making its own decisions.</p>
 
@@ -921,7 +912,7 @@
           </section>
 
           <section class="rd-section" id="rd-7">
-            <h2><span class="rd-num mono">07</span>MCP vs ACP vs AHP vs A2A</h2>
+            <h2>MCP vs ACP vs AHP vs A2A</h2>
             <p>Side by side, the differences in scope are sharper than any one project's documentation makes them look, because each spec is written as though it's the only protocol in the room.</p>
             <div class="rd-table-wrap">
               <table class="rd-table">
@@ -975,7 +966,7 @@
           </section>
 
           <section class="rd-section" id="rd-8">
-            <h2><span class="rd-num mono">08</span>How they can fit together</h2>
+            <h2>How they can fit together</h2>
             <p>One way to read the four boundaries as a single stack, human at the top, capabilities at the bottom. <strong style="color:var(--bone)">This is my reading of how the pieces compose, not an official architecture.</strong> None of the four specs describe themselves as part of a combined stack.</p>
 
             <div class="dg">
@@ -1031,7 +1022,7 @@
           </section>
 
           <section class="rd-section" id="rd-9">
-            <h2><span class="rd-num mono">09</span>What this means for builders</h2>
+            <h2>What this means for builders</h2>
             <p>If you're building a single-tenant agent, say a React frontend against your own backend with something like LangGraph doing the reasoning, you probably need one of these four and can ignore the other three for a long time.</p>
 
             <div class="dg">
@@ -1089,7 +1080,7 @@
           </section>
 
           <section class="rd-section" id="rd-10">
-            <h2><span class="rd-num mono">10</span>What is still unclear</h2>
+            <h2>What is still unclear</h2>
             <p>None of this is settled, and treating it as settled would be the wrong read. Four things I'd flag:</p>
             <ul>
               <li><strong style="color:var(--bone)">They weren't designed together.</strong> Four companies, four timelines, four immediate problems. That they compose as neatly as section 08 suggests is luck more than intent, and nothing keeps them compatible as each one moves.</li>
@@ -1100,7 +1091,7 @@
           </section>
 
           <section class="rd-section" id="rd-11">
-            <h2><span class="rd-num mono">11</span>Conclusion</h2>
+            <h2>Conclusion</h2>
             <p>The interesting part isn't that agents have protocols now. It's that four of them formed independently, around four different boundaries, with no central coordination, and mostly landed on compatible shapes anyway.</p>
             <p>Which also means the stack in section 08 probably won't look like that in a year. Some of these will merge or get absorbed, and boundaries that don't have names yet will get them. The habit is more durable than the diagram: ask which boundary you're standing on before reaching for a protocol built for a different one.</p>
           </section>
